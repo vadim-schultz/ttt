@@ -1,11 +1,7 @@
-from utils import schedule_from_players
 from pydantic import BaseModel
-import typing as ty
+from sqlalchemy import Column, Integer, String, create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
 
-from sqlalchemy import create_engine, Column, Integer, String, select
-
-from sqlalchemy.orm import sessionmaker, Session, declarative_base
-import sqlalchemy as db
 
 # schedule = schedule_from_players(
 #     ["Fan Zhendong", "Ma Long", "Xu Xin", "Tomokazu Harimoto", "Hugo Calderano", "Dummy1", "Dummy2", "Dummy3"]

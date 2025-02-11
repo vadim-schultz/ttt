@@ -1,20 +1,15 @@
-from litestar import Litestar, get, Response, Request, post
-from litestar.static_files.config import StaticFilesConfig
 from jinja2 import Environment, FileSystemLoader
-from litestar.exceptions import HTTPException, ValidationException
-from litestar.status_codes import HTTP_500_INTERNAL_SERVER_ERROR
+from litestar import Litestar, Request, Response, get, post
+from litestar.exceptions import HTTPException
 from litestar.response import Redirect
-from pydantic import BaseModel
-from utils import schedule_from_players, standings_from_results
-import typing as ty
-
-from sqlalchemy import create_engine, Column, Integer, String
+from litestar.status_codes import HTTP_500_INTERNAL_SERVER_ERROR
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
 
-from database_config import init_db_with_empty_results, Match, MatchSchema, tick
+from database_config import Match, tick
 from env import players
-
+from utils import schedule_from_players, standings_from_results
 
 Base = declarative_base()
 

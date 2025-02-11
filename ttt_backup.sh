@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# Define the source file and the backup directory
-SOURCE_FILE="/home/eckar_fl/Documents/ttt_server/ttt.db"
-BACKUP_DIR="/home/eckar_fl/Documents/ttt_server/bak"
+# Load variables from .env if the file exists
+export $(grep -v '^#' .env | xargs)
 
 # Get the current timestamp
 TIMESTAMP=$(date +"%Y%m%d%H%M%S")

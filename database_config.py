@@ -1,11 +1,8 @@
-from utils import schedule_from_players
-from pydantic import BaseModel
 import typing as ty
 
-from sqlalchemy import create_engine, Column, Integer, String, select
-
-from sqlalchemy.orm import sessionmaker, Session, declarative_base
-import sqlalchemy as db
+from pydantic import BaseModel
+from sqlalchemy import Column, Integer, String, create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 
 class StatsSchema(BaseModel):
