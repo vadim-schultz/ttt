@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="container">
+        <h1 class="display-4">{{ heading }}</h1>
+        <p class="lead">{{ message }}</p>
+
+        <!-- {% for result in results %}
+        <h2>{{ result }}</h2>
+        {% endfor %} -->
+        
+        {% set match_id = namespace(value=1) %}
+        {% set x = namespace(value=1) %}
+        {% for round in schedule %}
+        <h2>Round {{ x.value }} - WW {{ x.value + 8}}</h2>
+        <table class="table table-striped">
+            <col width="10%">
+            <col width="30%">
+            <col width="30%">
+            <col width="30%">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Pairing 1</th>
+                    <th>Pairing 2</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for match in round %}
+                <tr>
+                    <td>{{ match_id.value }}</td>
+                    <td>{{ match[0] }}, {{ match[1] }}</td>
+                    <td>{{ match[2] }}, {{ match[3] }}</td>
+                    <td>
+                        <div class="container">
+                            <div class="row">
+                              <div class="col-sm">
+                                <label for="result" align="left">{{ results[match_id.value - 1][0] }} : {{ results[match_id.value - 1][1] }}</label>
+                              </div>
+                              <div class="col-sm">
+                                <form action="/result/{{ match_id.value }}" align="right">
+                                    <input type=submit value="enter" style="width:100%"> 
+                                </form>
+                              </div>
+                            </div>
+                          </div>
+                        
+                        
+                    </td>
+                </tr>
+                {% set match_id.value = match_id.value + 1 %}
+                {% endfor %}
+            </tbody>
+        </table>
+        {% set x.value = x.value + 1 %}
+        
+        {% endfor %}
+    </div>
+{% endblock %}

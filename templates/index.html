@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container">
+        <h1 class="display-4">{{ heading }}</h1>
+        <p class="lead">{{ message }}</p>
+        
+        <p class="text-start"></p>
+        <ul class="list-group mb-4">
+            <li class="list-group-item">You can see the current standings in the "Standings" tab, the schedule in the "Schedule" tab in the navigation bar.</li>
+            <li class="list-group-item">Please schedule a specific match with your colleagues on your own. If you delay a match from a round due to vacation, sick leave or other time constraints, that's no problem.</li>
+            <li class="list-group-item">To avoid scheduling conflicts with other matches, you can make use of the "DE_DR_Table_Tennis" room in outlook to book your slot.</li>
+            <li class="list-group-item">To register a result, go to the "Schedule" tab, find your match in the table and click "enter". Follow the instructions.</li>
+            <li class="list-group-item">The number of points scored equals the number of sets won in a match.</li>
+            <li class="list-group-item">The list of players is shuffled randomly and split into groups of 4, to form the participants of a match for each round.</li>
+            <li class="list-group-item">Matches should be scheduled between Feb 24 (WW9) and May 2nd (WW18).</li>
+            <li class="list-group-item">Please remember that playing table tennis is leisure activity!</li>
+        </ul>
+
+
+    </div>
+{% endblock %}

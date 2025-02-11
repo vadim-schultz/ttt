@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container">
+        <h1 class="display-4">{{ heading }}</h1>
+        <p class="lead">{{ message }}</p>
+
+        <h4>{{ players[0] }},  {{ players[1] }} : {{ players[2] }},  {{ players[3] }}</h2>
+
+        <form action="/enter_result/{{ match_id }}" method="post" class="form-inline">
+            <div class="form-group">
+                <label for="result">Result</label>  
+                <input type="text" class="form-control ml-5" id="result0" name="result0" placeholder="{{ score[0] }}" value="{{ score[0] }}">
+                <label for="result" class="ml-3">:</label>
+                <input type="text" class="form-control ml-3" id="result1" name="result1" placeholder="{{ score[1] }}" value="{{ score[1] }}">
+            </div>
+
+            <button type="submit" class="btn btn-primary ml-5">Submit</button>
+        </form>
+        
+    </div>
+{% endblock %}
