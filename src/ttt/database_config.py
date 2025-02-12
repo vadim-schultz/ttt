@@ -50,7 +50,7 @@ class Stats(Base):
 
 def init_db_with_empty_results(schedule: ty.List[ty.List[str]]):
     engine = create_engine("sqlite:///ttt.db")
-    Match.__table__.drop(engine)
+    # Match.__table__.drop(engine)
     # Stats.__table__.drop(engine)
     Base.metadata.create_all(engine)
     session = sessionmaker(bind=engine)()
@@ -71,14 +71,14 @@ def init_db_with_empty_results(schedule: ty.List[ty.List[str]]):
             )
             id_counter += 1
 
-    session.commit()
-
+    # Uncomment these lines to initialise the database.
+    # session.commit()
     # paths = ["index", "current_standings", "schedule", "result", "enter_result", "rules"]
-
+    #
     # for id, path in enumerate(paths):
     #     session.add(Stats(uuid=id, path=path, count=0))
 
-    # session.commit()
+    session.commit()
 
 
 def tick(Session, path):
@@ -91,10 +91,6 @@ def tick(Session, path):
 
         session.commit()
 
-
-# Create a SQLite database in memory for demonstration purposes
-
-# engine = create_engine("sqlite:///:memory:")
 
 if __name__ == "__main__":
     # Create DB

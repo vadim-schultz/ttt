@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Load variables from .env if the file exists
-export $(grep -v '^#' .env | xargs)
+# Load variables from .env
+export $(grep -v '^#' ../.env | xargs)
 
 # Get the current timestamp
 TIMESTAMP=$(date +"%Y%m%d%H%M%S")
