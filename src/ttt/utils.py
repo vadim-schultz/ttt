@@ -5,9 +5,7 @@ import numpy as np
 
 def schedule_from_players(players: ty.List[str]):
     np.random.seed(7)
-    num_players = len(players)
 
-    # players = [Player(name=name) for name in players]
     matches = []
     for i in range(10):
         # Shuffle players
@@ -18,9 +16,6 @@ def schedule_from_players(players: ty.List[str]):
         # Convert back to lists
         round_x = [x.tolist() for x in round_x]
         matches.append(round_x)
-
-    # Convert to list of dictionary
-    # matches = [dict(zip(players, match)) for match in matches]
 
     return matches
 

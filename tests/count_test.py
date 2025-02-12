@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from database_config import Stats
+from ttt.database_config import Stats
 
 # Create a SQLite database in memory for demonstration purposes
 engine = create_engine("sqlite:///ttt.db")
