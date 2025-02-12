@@ -1,16 +1,15 @@
-from ttt.database_config import Match, tick, init_db_with_empty_results
-from env import players
 from jinja2 import Environment, FileSystemLoader
 from litestar import Litestar, Request, Response, get, post
 from litestar.exceptions import HTTPException
 from litestar.response import Redirect
 from litestar.status_codes import HTTP_500_INTERNAL_SERVER_ERROR
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session, sessionmaker
-from ttt.utils import schedule_from_players, standings_from_results
+from sqlalchemy.orm import sessionmaker
 
-Base = declarative_base()
+from env import players
+from ttt.db import tick  #, init_db
+from ttt.orm import Match
+from ttt.utils import schedule_from_players, standings_from_results
 
 # Set up Jinja2 environment
 template_loader = FileSystemLoader("templates")
@@ -26,13 +25,11 @@ standings = [
     # Add more players as needed
 ]
 
+# init_db()
 # Create a SQLite database in memory for demonstration purposes
 engine = create_engine("sqlite:///ttt.db")
-
 Session = sessionmaker(bind=engine)
-
 player_schedule = schedule_from_players(players)
-# init_db_with_empty_results(player_schedule)
 
 
 def app_exception_handler(request: Request, exc: HTTPException) -> Response:
@@ -41,7 +38,7 @@ def app_exception_handler(request: Request, exc: HTTPException) -> Response:
             "error": "server error",
             "path": request.url.path,
             "detail": exc.detail,
-            "status_code": exc.status_code,
+            "status_code": 500,
         },
         status_code=500,
     )
@@ -91,26 +88,34 @@ async def schedule() -> Response:
 
     with Session() as session:
         results = session.query(Match).all()
+
     tick(Session, "schedule")
 
-    results = [[result.score0, result.score1] for result in results]
+    schedule = [i.to_dict() for i in results]
+
+    for round in schedule:
+        print(f"Round: {round}")
+        for match in round:
+            print(f"match: {match}")
 
     html_content = template.render(
         title="Schedule",
         heading="Schedule",
         message="",
-        schedule=player_schedule,
-        results=results,
+        schedule=schedule,
     )
+
     return Response(content=html_content, media_type="text/html")
 
 
-@get("/result/{match_id: int}", exception_handlers={HTTP_500_INTERNAL_SERVER_ERROR: app_exception_handler})
-async def result(match_id: int) -> Response:
+@get("/result/{match_id: str}", exception_handlers={HTTP_500_INTERNAL_SERVER_ERROR: app_exception_handler})
+async def result(match_id: str) -> Response:
     template = jinja_env.get_template("result.html")
 
     with Session() as session:
-        result = session.query(Match).filter(Match.id == match_id).all()[0]  # .update({"score0": 2, "score1": 1})
+        print(match_id)
+        print(session.query(Match).filter(Match.id == match_id).all())
+        result = session.query(Match).filter(Match.id == match_id).all()[0]
     tick(Session, "result")
 
     score = [result.score0, result.score1]
@@ -127,8 +132,8 @@ async def result(match_id: int) -> Response:
     return Response(content=html_content, media_type="text/html")
 
 
-@post("/enter_result/{match_id: int}", exception_handlers={HTTP_500_INTERNAL_SERVER_ERROR: app_exception_handler})
-async def enter_result(match_id: int, request: Request) -> any:
+@post("/enter_result/{match_id: str}", exception_handlers={HTTP_500_INTERNAL_SERVER_ERROR: app_exception_handler})
+async def enter_result(match_id: str, request: Request) -> any:
     results = await request.form()
 
     score0, score1 = results["result0"], results["result1"]
