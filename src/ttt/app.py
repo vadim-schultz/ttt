@@ -1,3 +1,4 @@
+from env import players
 from jinja2 import Environment, FileSystemLoader
 from litestar import Litestar, Request, Response, get, post
 from litestar.exceptions import HTTPException
@@ -6,8 +7,7 @@ from litestar.status_codes import HTTP_500_INTERNAL_SERVER_ERROR
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from env import players
-from ttt.db import tick  #, init_db
+from ttt.db import tick  # , init_db
 from ttt.orm import Match
 from ttt.utils import schedule_from_players, standings_from_results
 
@@ -91,12 +91,8 @@ async def schedule() -> Response:
 
     tick(Session, "schedule")
 
-    schedule = [i.to_dict() for i in results]
-
-    for round in schedule:
-        print(f"Round: {round}")
-        for match in round:
-            print(f"match: {match}")
+    matches = [i.to_dict() for i in results]  # all matches
+    schedule = [matches[i : i + 6] for i in range(0, len(matches), 6)]  # break into rounds
 
     html_content = template.render(
         title="Schedule",
@@ -113,8 +109,6 @@ async def result(match_id: str) -> Response:
     template = jinja_env.get_template("result.html")
 
     with Session() as session:
-        print(match_id)
-        print(session.query(Match).filter(Match.id == match_id).all())
         result = session.query(Match).filter(Match.id == match_id).all()[0]
     tick(Session, "result")
 
@@ -124,7 +118,7 @@ async def result(match_id: str) -> Response:
     html_content = template.render(
         title="Result",
         heading="Submit result",
-        message=f"Result for Match ID {match_id}",
+        message=f"Result for match between {players[0]}, {players[1]} and {players[2]}, {players[3]}.",
         match_id=match_id,
         score=score,
         players=players,
