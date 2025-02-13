@@ -9,6 +9,7 @@ Base = declarative_base()
 class Match(Base):
     __tablename__ = "matches"
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+
     player0 = Column(String)
     player1 = Column(String)
     player2 = Column(String)

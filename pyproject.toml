@@ -21,6 +21,7 @@ dependencies = [
     "jinja2",
     "pydantic",
     "sqlalchemy",
+    "numpy",
 ]
 # Dynamic versioning with setuptools_scm
 dynamic = ["version"]

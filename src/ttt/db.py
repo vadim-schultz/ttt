@@ -1,9 +1,10 @@
+from env import players
 from sqlalchemy import create_engine, inspect
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm import sessionmaker
+
 from ttt.orm import Base, Match, Stats
 from ttt.utils import schedule_from_players
-from env import players
 
 
 def get_default_schedule():
@@ -30,7 +31,7 @@ def init_db(db_url="sqlite:///ttt.db"):
     # Check if tables are empty and populate with default values if needed
     inspector = inspect(engine)
 
-    if 'matches' in inspector.get_table_names():
+    if "matches" in inspector.get_table_names():
         if session.query(Match).count() == 0:
             for round in get_default_schedule():
                 for match in round:
@@ -44,7 +45,7 @@ def init_db(db_url="sqlite:///ttt.db"):
                     )
             session.commit()
 
-    if 'stats' in inspector.get_table_names():
+    if "stats" in inspector.get_table_names():
         if session.query(Stats).count() == 0:
             session.add_all(get_default_stats())
             session.commit()
@@ -62,4 +63,3 @@ def tick(Session, path):
 
 if __name__ == "__main__":
     init_db()
-
