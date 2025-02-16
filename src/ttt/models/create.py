@@ -1,6 +1,6 @@
 from datetime import date
 
-from pydantic import BaseModel, UUID4, field_serializer
+from pydantic import UUID4, BaseModel, field_serializer
 
 
 class Tournament(BaseModel):

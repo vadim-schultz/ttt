@@ -1,19 +1,19 @@
 [build-system]
-requires = ["setuptools>=64", "setuptools-scm[toml]>=8","wheel"]
+requires = ["setuptools>=64", "setuptools-scm[toml]>=8", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "ttt"
 description = "A web app to run table tennis tournaments."
 readme = "README.md"
-license = {file = "LICENSE"}
+license = { file = "LICENSE" }
 authors = [
-    {name = "Florian Eckardt", email = "florianeckardt91@gmail.com"},
-    {name = "Vadim Schultz", email = "vadim.schultz@me.com"},
+    { name = "Florian Eckardt", email = "florianeckardt91@gmail.com" },
+    { name = "Vadim Schultz", email = "vadim.schultz@me.com" },
 ]
 maintainers = [
-    {name = "Florian Eckardt", email = "florianeckardt91@gmail.com"},
-    {name = "Vadim Schultz", email = "vadim.schultz@me.com"},
+    { name = "Florian Eckardt", email = "florianeckardt91@gmail.com" },
+    { name = "Vadim Schultz", email = "vadim.schultz@me.com" },
 ]
 requires-python = ">=3.11"
 dependencies = [
