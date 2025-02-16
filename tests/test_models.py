@@ -46,7 +46,7 @@ def db_session(engine, tables):
     transaction.rollback()
     connection.close()
 
-# Helper method to create a complete tournament with nested rounds, games, teams, and players
+# Helper method to create a complete tournament with nested rounds, matches, teams, and players
 def create_complete_tournament(db_session):
     # Create tournament using TournamentCreate schema
     tournament_data = models.create.Tournament(
@@ -59,7 +59,7 @@ def create_complete_tournament(db_session):
     db_session.add(tournament_model)
     db_session.commit()
 
-    # Create rounds, games, teams, and players
+    # Create rounds, matches, teams, and players
     for round_number in range(1, tournament_data.rounds_count + 1):
         round_data = models.create.Round(round_number=round_number, tournament_id=tournament_model.id)
         round_model = orm.Round(**round_data.model_dump())  # Convert to ORM model
@@ -67,19 +67,19 @@ def create_complete_tournament(db_session):
         db_session.add(round_model)
         db_session.commit()
 
-        # Create games for each round
-        for game_number in range(1, 3):  # Creating 2 games for each round (example)
-            game_data = models.create.Match(round_id=round_model.id)
-            game_model = orm.Game(**game_data.model_dump())
+        # Create matches for each round
+        for match_number in range(1, 3):  # Creating 2 matches for each round (example)
+            match_data = models.create.Match(round_id=round_model.id)
+            match_model = orm.Match(**match_data.model_dump())
 
-            db_session.add(game_model)
+            db_session.add(match_model)
             db_session.commit()
 
-            # Create teams for each game
-            team1_data = models.create.Team(game_id=game_model.id)
+            # Create teams for each match
+            team1_data = models.create.Team(match_id=match_model.id)
             team1_model = orm.Team(**team1_data.model_dump())
 
-            team2_data = models.create.Team(game_id=game_model.id)
+            team2_data = models.create.Team(match_id=match_model.id)
             team2_model = orm.Team(**team2_data.model_dump())
 
             db_session.add(team1_model)
@@ -120,7 +120,7 @@ def test_create_and_read_tournament(db_session):
     assert tournament_read_model.status == "ongoing"
 
 
-# Test for reading a round, game, and team with players
+# Test for reading a round, match, and team with players
 def test_read_round_and_nested_models(db_session):
     # Create a complete tournament first
     created_tournament = create_complete_tournament(db_session)
@@ -130,40 +130,40 @@ def test_read_round_and_nested_models(db_session):
     round_read_model = models.read.Round.model_validate(round_from_db)
     print("Round from DB:", round_read_model)
 
-    # Read back games for the round
-    for game in round_read_model.games:
-        print(f"Game {game.id} with {len(game.teams)} teams:")
-        for team in game.teams:
+    # Read back matches for the round
+    for match in round_read_model.matches:
+        print(f"Match {match.id} with {len(match.teams)} teams:")
+        for team in match.teams:
             print(f"  Team {team.id} with score {team.score} and players: {', '.join([player.name for player in team.players])}")
 
-    # Assert the round has games and teams
-    assert len(round_read_model.games) > 0  # Should have games
-    assert len(round_read_model.games[0].teams) == 2  # Should have two teams per game
+    # Assert the round has matches and teams
+    assert len(round_read_model.matches) > 0  # Should have matches
+    assert len(round_read_model.matches[0].teams) == 2  # Should have two teams per match
 
 
-# Test for creating a game and updating team scores
-def test_update_game_score(db_session):
+# Test for creating a match and updating team scores
+def test_update_match_score(db_session):
     # Create a complete tournament first
     created_tournament = create_complete_tournament(db_session)
 
-    # Get the first game from the first round
+    # Get the first match from the first round
     first_round = db_session.query(orm.Round).filter(orm.Round.tournament_id == created_tournament.id).first()
-    game = db_session.query(orm.Game).filter(orm.Game.round_id == first_round.id).first()
+    match = db_session.query(orm.Match).filter(orm.Match.round_id == first_round.id).first()
 
-    # Update the score for the teams in the game
-    game_score_data = models.modify.TeamScore(
-        game_id=game.id,
+    # Update the score for the teams in the match
+    match_score_data = models.modify.TeamScore(
+        match_id=match.id,
         team_scores=[3, 2]  # Team 1's score is 3, Team 2's score is 2
     )
 
-    # Step 1: Get the teams for the game
-    teams = game.teams
-    teams[0].score = game_score_data.team_scores[0]
-    teams[1].score = game_score_data.team_scores[1]
+    # Step 1: Get the teams for the match
+    teams = match.teams
+    teams[0].score = match_score_data.team_scores[0]
+    teams[1].score = match_score_data.team_scores[1]
     db_session.commit()
 
-    # Step 2: Read back the updated game and teams
-    updated_game = db_session.query(orm.Game).filter(orm.Game.id == game.id).first()
+    # Step 2: Read back the updated match and teams
+    updated_match = db_session.query(orm.Match).filter(orm.Match.id == match.id).first()
 
-    assert updated_game.teams[0].score == 3
-    assert updated_game.teams[1].score == 2
+    assert updated_match.teams[0].score == 3
+    assert updated_match.teams[1].score == 2

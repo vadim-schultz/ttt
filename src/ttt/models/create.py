@@ -27,11 +27,11 @@ class Match(BaseModel):
 
 
 class Team(BaseModel):
-    game_id: UUID4  # Foreign key
+    match_id: UUID4  # Foreign key
 
-    @field_serializer("game_id")
-    def serialize_uuid(self, game_id):
-        return str(game_id)
+    @field_serializer("match_id")
+    def serialize_uuid(self, match_id):
+        return str(match_id)
 
 
 class Player(BaseModel):

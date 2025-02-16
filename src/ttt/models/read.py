@@ -18,7 +18,7 @@ class Round(BaseModel):
     id: UUID4
     round_number: int
     tournament_id: UUID4
-    games: List["Match"] = Field(..., default_factory=list)
+    matches: List["Match"] = Field(..., default_factory=list)
 
     class Config:
         from_attributes = True
@@ -36,7 +36,7 @@ class Match(BaseModel):
 
 class Team(BaseModel):
     id: UUID4
-    game_id: UUID4
+    match_id: UUID4
     players: List["Player"] = Field(..., default_factory=list)
     score: int
 

@@ -36,25 +36,25 @@ class Round(Base):
     round_number = Column(Integer, nullable=False)
     tournament_id = Column(String, ForeignKey('tournaments.id'))
     tournament = relationship("Tournament", back_populates="rounds")
-    games = relationship("Game", back_populates="round", cascade="all, delete-orphan")
+    matches = relationship("Match", back_populates="round", cascade="all, delete-orphan")
 
 
-class Game(Base):
-    __tablename__ = 'games'
+class Match(Base):
+    __tablename__ = 'matches'
     id = Column(String, primary_key=True, default=get_uuid)
     round_id = Column(String, ForeignKey('rounds.id'))
 
-    round = relationship("Round", back_populates="games")
-    teams = relationship("Team", back_populates="game", cascade="all, delete-orphan")
+    round = relationship("Round", back_populates="matches")
+    teams = relationship("Team", back_populates="match", cascade="all, delete-orphan")
 
 
 class Team(Base):
     __tablename__ = 'teams'
     id = Column(String, primary_key=True, default=get_uuid)
-    game_id = Column(String, ForeignKey('games.id'))
+    match_id = Column(String, ForeignKey('matches.id'))
     score = Column(Integer, default=0)  # Score stored in the team
 
-    game = relationship("Game", back_populates="teams")
+    match = relationship("Match", back_populates="teams")
     players = relationship("Player", secondary=player_team_association, back_populates="teams")
 
 
