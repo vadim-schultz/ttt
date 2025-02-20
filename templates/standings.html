@@ -1,29 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
-    <div class="container">
-        <h1 class="display-4">{{ heading }}</h1>
-        <p class="lead">{{ message }}</p>
+<div class="container">
+    <h1 class="display-4">{{ heading }}</h1>
+    <p class="lead">{{ message }}</p>
 
-        <h2>World Standings</h2>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Rank</th>
-                    <th>Player</th>
-                    <th>Points</th>
-                    <th>Matches Played</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for player in standings %}
-                <tr>
-                    <td>{{ player.rank }}</td>
-                    <td>{{ player.name }}</td>
-                    <td>{{ player.points }}</td>
-                    <td>{{ player.matches_played }}</td>                    
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <h2>World Standings</h2>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Player</th>
+            <th>Points</th>
+            <th>Matches Played</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for player in standings %}
+        <tr>
+            <td>{{ player.rank }}</td>
+            <td>{{ player.name }}</td>
+            <td>{{ player.points }}</td>
+            <td>{{ player.matches_played }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

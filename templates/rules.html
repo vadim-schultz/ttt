@@ -1,46 +1,71 @@
 {% extends "base.html" %}
 {% block content %}
-    <div class="container">
-        <h1 class="display-4">{{ heading }}</h1>
-        <p class="lead">{{ message }}</p>
+<div class="container">
+    <h1 class="display-4">{{ heading }}</h1>
+    <p class="lead">{{ message }}</p>
 
-        <h2 class="mb-4">Table Tennis Rules</h2>
-        
-        <h3>Set and Match</h3>
-        <ul class="list-group mb-4">
-            <li class="list-group-item">The first player to score 11 points wins the set.</li>
-            <li class="list-group-item">A set must be won by a two-point difference - a set can therefore end 12:10, 13:11, etc.</li>
-            <li class="list-group-item font-weight-bold">A match ends after 4 sets.</li>
-        </ul>
+    <h2 class="mb-4">Table Tennis Rules</h2>
 
-        <h3>Doubles Rules</h3>
-        <ul class="list-group mb-4">
-            <li class="list-group-item">The doubles pair that wins the choice of serve decides who serves first.</li>
-            <li class="list-group-item">Each of the two partners who won the serve choice serves twice. The opponents can choose who returns the serve.</li>
-            <li class="list-group-item">When the serve changes, the previous receiver serves to the partner of the previous server.</li>
-            <li class="list-group-item">This order changes every set. In the next set, you serve to the player from whom you received serves in the previous set.</li>
-            <li class="list-group-item">The serve must first touch the right half of your side of the table (forehand side for right-handers) before bouncing in the diagonally opposite half on the other side of the table.</li>
-        </ul>
+    <h3>Set and Match</h3>
+    <ul class="list-group mb-4">
+        <li class="list-group-item">The first player to score 11 points wins the set.</li>
+        <li class="list-group-item">A set must be won by a two-point difference - a set can therefore end 12:10, 13:11,
+            etc.
+        </li>
+        <li class="list-group-item font-weight-bold">A match ends after 4 sets.</li>
+    </ul>
 
-        <h3>Service Rules</h3>
-        <ul class="list-group mb-4">
-            <li class="list-group-item">The choice of serve or side is decided by a coin toss - if you win the toss, you can choose either to serve/receive or to pick a specific side of the table.</li>
-            <li class="list-group-item">You must place the ball in your open hand.</li>
-            <li class="list-group-item">The ball must be thrown vertically at least 16cm high.</li>
-            <li class="list-group-item">The ball must be visible to the opponent at all times and must not touch anything other than the paddle.</li>
-            <li class="list-group-item">The serve must first bounce on your side of the table and then on the opponent's side. Unlike in doubles, it does not matter which side you place the serve on.</li>
-            <li class="list-group-item">If the ball touches the net but still lands on the opponent's side, the serve must be repeated.</li>
-        </ul>
+    <h3>Doubles Rules</h3>
+    <ul class="list-group mb-4">
+        <li class="list-group-item">The doubles pair that wins the choice of serve decides who serves first.</li>
+        <li class="list-group-item">Each of the two partners who won the serve choice serves twice. The opponents can
+            choose who returns the serve.
+        </li>
+        <li class="list-group-item">When the serve changes, the previous receiver serves to the partner of the previous
+            server.
+        </li>
+        <li class="list-group-item">This order changes every set. In the next set, you serve to the player from whom you
+            received serves in the previous set.
+        </li>
+        <li class="list-group-item">The serve must first touch the right half of your side of the table (forehand side
+            for right-handers) before bouncing in the diagonally opposite half on the other side of the table.
+        </li>
+    </ul>
 
-        <h3>Rallies</h3>
-        <ul class="list-group mb-4">
-            <li class="list-group-item">During a rally, you must always play the ball directly to the opponent's side of the table.</li>
-            <li class="list-group-item">The ball must not be hit volley like in tennis; it must first bounce on your side of the table.</li>
-            <li class="list-group-item">A net roller does not lead to a repetition of the rally - the rally continues as normal.</li>
-            <li class="list-group-item">An edge ball is counted if the ball touches the edge of the table from above.</li>
-            <li class="list-group-item">An edge ball is not counted if the ball touches the edge of the table from below.</li>
-            <li class="list-group-item">Touching the ball with your finger does not result in a fault.</li>
-        </ul>
+    <h3>Service Rules</h3>
+    <ul class="list-group mb-4">
+        <li class="list-group-item">The choice of serve or side is decided by a coin toss - if you win the toss, you can
+            choose either to serve/receive or to pick a specific side of the table.
+        </li>
+        <li class="list-group-item">You must place the ball in your open hand.</li>
+        <li class="list-group-item">The ball must be thrown vertically at least 16cm high.</li>
+        <li class="list-group-item">The ball must be visible to the opponent at all times and must not touch anything
+            other than the paddle.
+        </li>
+        <li class="list-group-item">The serve must first bounce on your side of the table and then on the opponent's
+            side. Unlike in doubles, it does not matter which side you place the serve on.
+        </li>
+        <li class="list-group-item">If the ball touches the net but still lands on the opponent's side, the serve must
+            be repeated.
+        </li>
+    </ul>
 
-    </div>
+    <h3>Rallies</h3>
+    <ul class="list-group mb-4">
+        <li class="list-group-item">During a rally, you must always play the ball directly to the opponent's side of the
+            table.
+        </li>
+        <li class="list-group-item">The ball must not be hit volley like in tennis; it must first bounce on your side of
+            the table.
+        </li>
+        <li class="list-group-item">A net roller does not lead to a repetition of the rally - the rally continues as
+            normal.
+        </li>
+        <li class="list-group-item">An edge ball is counted if the ball touches the edge of the table from above.</li>
+        <li class="list-group-item">An edge ball is not counted if the ball touches the edge of the table from below.
+        </li>
+        <li class="list-group-item">Touching the ball with your finger does not result in a fault.</li>
+    </ul>
+
+</div>
 {% endblock %}
