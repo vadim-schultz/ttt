@@ -147,3 +147,13 @@ def tournament(db_session, player_names):
     db_session.commit()
 
     return tournament_model  # Return the created tournament
+
+
+@pytest.fixture
+def tournament_model(tournament):
+    return models.read.Tournament.model_validate(tournament)
+
+
+@pytest.fixture
+def round_model(tournament_model):
+    return tournament_model.rounds[0]

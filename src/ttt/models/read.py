@@ -1,7 +1,7 @@
 from datetime import date
 from typing import List
 
-from pydantic import UUID4, BaseModel, Field, ConfigDict
+from pydantic import UUID4, BaseModel, ConfigDict, Field
 
 
 class Tournament(BaseModel):
