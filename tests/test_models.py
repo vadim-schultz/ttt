@@ -28,10 +28,8 @@ def test_read_round_and_nested_models(db_session, tournament):
     for match in round_read_model.matches:
         print(f"Match {match.id} with {len(match.teams)} teams:")
         for team in match.teams:
-            players = ', '.join([player.name for player in team.players])
-            print(
-                f"  Team {team.id} with score {team.score} and players: {players}"
-            )
+            players = ", ".join([player.name for player in team.players])
+            print(f"  Team {team.id} with score {team.score} and players: {players}")
 
     # Assert the round has matches and teams
     assert len(round_read_model.matches) > 0  # Should have matches
