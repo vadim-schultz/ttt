@@ -26,12 +26,18 @@ def litestar_app(tournament_model):
         """Fetches a single round and renders its details."""
         return Template("_round.html", context={"round": tournament_model.rounds[0]})
 
+    @get("/match/{match_id:str}")
+    async def match_detail(match_id: uuid.UUID) -> Template:
+        """Fetches a single match and renders its details."""
+        return Template("_match.html", context={"match": tournament_model.rounds[0].matches[0]})
+
     # Define the Litestar app
     app = Litestar(
         route_handlers=[
             tournaments_list,
             tournament_detail,
             round_detail,
+            match_detail,
         ],
         template_config=TemplateConfig(
             directory="../templates",
@@ -67,6 +73,16 @@ def test_template_round(litestar_app, round_model):
 
     with TestClient(litestar_app) as client:
         response = client.get(f"/round/{round_model.id}")
+
+    assert response.status_code == 200
+    assert response.text
+
+
+def test_template_match(litestar_app, round_model):
+    """Runs a local Litestar app and tests rendering of a single round."""
+
+    with TestClient(litestar_app) as client:
+        response = client.get(f"/match/{round_model.matches[0].id}")
 
     assert response.status_code == 200
     assert response.text
