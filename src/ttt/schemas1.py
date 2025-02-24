@@ -1,5 +1,6 @@
 from uuid import UUID, uuid4
-from pydantic import BaseModel, Field, conint, model_validator
+from datetime import date
+from pydantic import BaseModel, Field, field_serializer, conint, model_validator
 from typing import List, Literal
 
 
@@ -12,8 +13,12 @@ class Player(BaseModel):
 
 
 class Team(BaseModel):
-    id: UUID = Field(default_factory=uuid4)
+    match_id: UUID = Field(default_factory=uuid4)
     players: List[Player]
+
+    @field_serializer("match_id")
+    def serialize_uuid(self, match_id):
+        return str(match_id)
 
     @model_validator(mode="before")
     @classmethod
@@ -97,20 +102,41 @@ class Game(BaseModel):
 
 
 class Round(BaseModel):
-    id: UUID = Field(default_factory=uuid4)
-    tournament_id: UUID
+    tournament_id: UUID = Field(default_factory=uuid4)
     name: str = Field(..., description="Round name (Quarter-finals, Semi-finals, Finals)")
     rounds: List[Game]
+    round_number: int = Field(..., ge=0, le=10,description="Round number must be between 1 and 10.")
+
+    @field_serializer("tournament_id")
+    def serialize_uuid(self, tournament_id):
+        return str(tournament_id)
 
     class Config:
         from_attributes = True  
+
+class Match(BaseModel):
+    round_id: UUID = Field(default_factory=uuid4) # Foreign key
+
+    @field_serializer("round_id")
+    def serialize_uuid(self, round_id):
+        return str(round_id)
 
 
 class Tournament(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     name: str = Field(..., min_length=3, max_length=100, description="Tournament name")
     rounds: List[Round]
+    start_date: date
+    status: str = "ongoing"
+    rounds_count: int
 
+    @model_validator(mode="before")
+    @classmethod
+    def validate_start_date(cls, values):
+        if values["start_date"] < date.today():
+            raise ValueError("Tournament start date cannot be in the past.")
+        return values
+    
 
     class Config:
         from_attributes = True  
