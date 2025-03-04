@@ -1,167 +1,100 @@
-from env import players
-from jinja2 import Environment, FileSystemLoader
-from litestar import Litestar, Request, Response, get, post
-from litestar.exceptions import HTTPException
-from litestar.response import Redirect
-from litestar.status_codes import HTTP_500_INTERNAL_SERVER_ERROR
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from pathlib import Path
 
-from ttt.db import tick  # , init_db
-from ttt.orm import Match
-from ttt.utils import schedule_from_players, standings_from_results
+from litestar import Litestar, Request, get, post
+from litestar.contrib.jinja import JinjaTemplateEngine
+from litestar.di import Provide
+from litestar.response import Redirect, Template
+from litestar.template.config import TemplateConfig
+from sqlalchemy import func
+from sqlalchemy.orm import Session
 
-# Set up Jinja2 environment
-template_loader = FileSystemLoader("templates")
-jinja_env = Environment(loader=template_loader)
-
-# Sample data for world standings
-standings = [
-    {"rank": 1, "name": "Fan Zhendong", "country": "China", "points": 15000},
-    {"rank": 2, "name": "Ma Long", "country": "China", "points": 14500},
-    {"rank": 3, "name": "Xu Xin", "country": "China", "points": 14000},
-    {"rank": 4, "name": "Tomokazu Harimoto", "country": "Japan", "points": 13500},
-    {"rank": 5, "name": "Hugo Calderano", "country": "Brazil", "points": 13000},
-    # Add more players as needed
-]
-
-# init_db()
-# Create a SQLite database in memory for demonstration purposes
-engine = create_engine("sqlite:///ttt.db")
-Session = sessionmaker(bind=engine)
-player_schedule = schedule_from_players(players)
+import ttt.models as models
+import ttt.schemas.orm as orm
+from ttt.db import get_db_session
 
 
-def app_exception_handler(request: Request, exc: HTTPException) -> Response:
-    return Response(
-        content={
-            "error": "server error",
-            "path": request.url.path,
-            "detail": exc.detail,
-            "status_code": 500,
-        },
-        status_code=500,
+def get_templates() -> Path:
+    """Provide absolute path to `templates` directory."""
+    relative_path = Path(__file__).parent / "./templates"
+    absolute_path = relative_path.resolve()
+    print(absolute_path)
+    return absolute_path
+
+
+@get("/", dependencies={"db": Provide(get_db_session)})
+async def tournaments(db: Session) -> Template:
+    result = db.query(orm.Tournament).all()
+    tournaments = [models.read.Tournament.model_validate(tournament) for tournament in result]
+    return Template("tournaments.html", context={"tournaments": tournaments})
+
+
+@get("/tournament/{tournament_id:str}", dependencies={"db": Provide(get_db_session)})
+async def tournament(db: Session, tournament_id: str) -> Template:
+    """Fetches a single tournament and renders its details."""
+    result = db.query(orm.Tournament).filter(orm.Tournament.id == tournament_id).first()
+    tournament = models.read.Tournament.model_validate(result)
+    return Template("tournament.html", context={"tournament": tournament})
+
+
+@get("/leaderboard", dependencies={"db": Provide(get_db_session)})
+async def leaderboard(db: Session) -> Template:
+    """Fetches all players sorted by highest score first and renders them in a table."""
+    # result = db.query(orm.Player).order_by(orm.Player.cumulative_score.desc()).all()
+    result = (
+        db.query(orm.Player.id, orm.Player.name, func.coalesce(func.sum(orm.Team.score), 0).label("cumulative_score"))
+        .join(orm.player_team_association, orm.Player.id == orm.player_team_association.c.player_id)
+        .join(orm.Team, orm.player_team_association.c.team_id == orm.Team.id)
+        .group_by(orm.Player.id, orm.Player.name)
+        .order_by(func.sum(orm.Team.score).desc())
+        .all()
+    )
+    players = [models.read.Player.model_validate(player._asdict()) for player in result]
+
+    return Template("leaderboard.html", context={"players": players})
+
+
+@post("/score", dependencies={"db": Provide(get_db_session)})
+async def update_score(request: Request, db: Session) -> Redirect:
+    """Updates team scores for a given match and redirects back to the tournament page."""
+    form_data = await request.form()
+    match_score = models.read.MatchScore(
+        match_id=form_data["match_id"],
+        team_ids=[form_data["team1_id"], form_data["team2_id"]],
+        team_scores=[form_data["team1_score"], form_data["team2_score"]],
     )
 
+    match = db.query(orm.Match).filter(orm.Match.id == match_score.match_id).first()
 
-# Define a route
-@get("/", exception_handlers={HTTP_500_INTERNAL_SERVER_ERROR: app_exception_handler})
-async def index() -> Response:
-    template = jinja_env.get_template("index.html")
-    html_content = template.render(
-        title="Office Table Tennis League",
-        heading="Office Table Tennis League",
-        message="Infos",
-        standings=standings,
+    if not match:
+        return Redirect("/leaderboard/?error=Match not found")
+
+    # Ensure both team IDs exist in the match
+    teams = (
+        db.query(orm.Team)
+        .filter(orm.Team.id.in_(match_score.team_ids), orm.Team.match_id == match_score.match_id)
+        .all()
     )
+    if len(teams) != 2:
+        return Redirect("/leaderboard/?error=Invalid teams")
 
-    tick(Session, "index")
-    return Response(content=html_content, media_type="text/html")
+    # Update scores
+    for team, new_score in zip(teams, match_score.team_scores):
+        team.score = new_score  # Overwrite score
 
-
-@get("/standings")
-async def current_standings() -> Response:
-    template = jinja_env.get_template("standings.html")
-
-    with Session() as session:
-        all_matches = session.query(Match).all()
-
-    tick(Session, "current_standings")
-    standings = standings_from_results(all_matches, players)
-
-    html_content = template.render(
-        title="Current standings",
-        heading="",
-        message="",
-        standings=standings,
-    )
-    return Response(content=html_content, media_type="text/html")
+    db.commit()  # Save changes
+    return Redirect("/leaderboard/?success=Score updated")
 
 
-# Endpoint for schedule
-@get(
-    "/schedule",
-    exception_handlers={HTTP_500_INTERNAL_SERVER_ERROR: app_exception_handler},
+app = Litestar(
+    route_handlers=[
+        tournaments,
+        tournament,
+        leaderboard,
+        update_score,
+    ],
+    template_config=TemplateConfig(
+        directory=get_templates(),
+        engine=JinjaTemplateEngine,
+    ),
+    debug=True,
 )
-async def schedule() -> Response:
-    template = jinja_env.get_template("schedule.html")
-
-    with Session() as session:
-        results = session.query(Match).all()
-
-    tick(Session, "schedule")
-
-    matches = [i.to_dict() for i in results]  # all matches
-    schedule = [matches[i : i + 6] for i in range(0, len(matches), 6)]  # break into rounds
-
-    html_content = template.render(
-        title="Schedule",
-        heading="Schedule",
-        message="",
-        schedule=schedule,
-    )
-
-    return Response(content=html_content, media_type="text/html")
-
-
-@get("/result/{match_id: str}", exception_handlers={HTTP_500_INTERNAL_SERVER_ERROR: app_exception_handler})
-async def result(match_id: str) -> Response:
-    template = jinja_env.get_template("result.html")
-
-    with Session() as session:
-        result = session.query(Match).filter(Match.id == match_id).all()[0]
-    tick(Session, "result")
-
-    score = [result.score0, result.score1]
-    players = [result.player0, result.player1, result.player2, result.player3]
-
-    html_content = template.render(
-        title="Result",
-        heading="Submit result",
-        message=f"Result for match between {players[0]}, {players[1]} and {players[2]}, {players[3]}.",
-        match_id=match_id,
-        score=score,
-        players=players,
-    )
-    return Response(content=html_content, media_type="text/html")
-
-
-@post("/enter_result/{match_id: str}", exception_handlers={HTTP_500_INTERNAL_SERVER_ERROR: app_exception_handler})
-async def enter_result(match_id: str, request: Request) -> any:
-    results = await request.form()
-
-    score0, score1 = results["result0"], results["result1"]
-
-    try:
-        score0 = int(score0)
-        score1 = int(score1)
-    except Exception:
-        return "No valid integers provided."
-
-    if score0 + score1 not in [0, 4]:
-        return "Scores don't add up to 4. Enter 4 sets please."
-
-    with Session() as session:
-        session.query(Match).filter(Match.id == match_id).update({"score0": score0, "score1": score1})
-        session.commit()
-    tick(Session, "enter_result")
-
-    return Redirect(path="/schedule")
-
-
-@get("/rules", exception_handlers={HTTP_500_INTERNAL_SERVER_ERROR: app_exception_handler})
-async def rules() -> Response:
-    template = jinja_env.get_template("rules.html")
-    html_content = template.render(
-        title="Short Table Tennis Rules",
-        heading="",
-        message="",
-        standings=standings,
-    )
-
-    tick(Session, "rules")
-    return Response(content=html_content, media_type="text/html")
-
-
-# Create the Litestar app
-app = Litestar(route_handlers=[index, current_standings, schedule, result, enter_result, rules])
