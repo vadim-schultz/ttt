@@ -13,7 +13,7 @@ def test_create_and_read_tournament(db_session, tournament):
 
     # Step 2: Assert the tournament data is correct
     assert str(tournament_read_model.start_date) == "2025-02-15"
-    assert tournament_read_model.rounds_count == 5
+    assert tournament_read_model.rounds_count == 10
     assert tournament_read_model.status == "ongoing"
 
 

@@ -47,15 +47,15 @@ def engine():
 @pytest.fixture(scope="session")
 def tables(engine):
     orm.Base.metadata.create_all(engine)
-    yield
-    orm.Base.metadata.drop_all(engine)
+    # yield
+    # orm.Base.metadata.drop_all(engine)
 
 
 @pytest.fixture(scope="function")
 def db_session(engine, tables):
     """Returns an sqlalchemy session, and after the test tears down everything properly."""
     connection = engine.connect()
-    transaction = connection.begin()
+    # transaction = connection.begin()
 
     # Bind an individual Session to the connection
     Session = sessionmaker(bind=connection)
@@ -64,8 +64,8 @@ def db_session(engine, tables):
     yield session
 
     session.close()
-    transaction.rollback()
-    connection.close()
+    # transaction.rollback()
+    # connection.close()
 
 
 @pytest.fixture
@@ -73,7 +73,7 @@ def tournament(db_session, player_names):
     """Create a full tournament with 24 players, following the correct hierarchy."""
 
     # Step 1: Create the Tournament
-    tournament_data = models.create.Tournament(start_date="2025-02-15", rounds_count=5)
+    tournament_data = models.create.Tournament(start_date="2025-02-15", rounds_count=10)
     tournament_model = orm.Tournament(**tournament_data.model_dump())
 
     db_session.add(tournament_model)

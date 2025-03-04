@@ -14,22 +14,22 @@ def litestar_app(tournament_model):
 
     @get("/tournaments")
     async def tournaments_list() -> Template:
-        return Template("_tournaments.html", context={"tournaments": [tournament_model, tournament_model]})
+        return Template("tournaments.html", context={"tournaments": [tournament_model, tournament_model]})
 
     @get("/tournament/{tournament_id:str}")
     async def tournament_detail(tournament_id: uuid.UUID) -> Template:
         """Fetches a single tournament and renders its details."""
-        return Template("_tournament.html", context={"tournament": tournament_model})
+        return Template("tournament.html", context={"tournament": tournament_model})
 
     @get("/round/{round_id:str}")
     async def round_detail(round_id: uuid.UUID) -> Template:
         """Fetches a single round and renders its details."""
-        return Template("_round.html", context={"round": tournament_model.rounds[0]})
+        return Template("round.html", context={"round": tournament_model.rounds[0]})
 
     @get("/match/{match_id:str}")
     async def match_detail(match_id: uuid.UUID) -> Template:
         """Fetches a single match and renders its details."""
-        return Template("_match.html", context={"match": tournament_model.rounds[0].matches[0]})
+        return Template("match.html", context={"match": tournament_model.rounds[0].matches[0]})
 
     # Define the Litestar app
     app = Litestar(
