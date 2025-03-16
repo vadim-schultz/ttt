@@ -1,15 +1,19 @@
 from uuid import UUID, uuid4
 from datetime import date
-from pydantic import BaseModel, Field, field_serializer, conint, model_validator
+from pydantic import BaseModel, Field, ConfigDict, field_serializer, conint, model_validator, field_validator
 from typing import List, Literal
+from datetime import date as DateType, time as TimeType
+
 
 
 class Player(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     name: str = Field(..., min_length=2, max_length=50, description="Player's name")
     score: conint(ge=0, le=4) = 0  
-    class Config:
-        from_attributes = True
+
+    __config__: ConfigDict = {
+        'from_attributes': True,
+    }
 
 
 class Team(BaseModel):
@@ -24,21 +28,25 @@ class Team(BaseModel):
     @classmethod
     def check_players(cls, values):
         players = values.get("players", [])
-        if len(players) not in [1, 2]:
+        if not (1 <= len(players) <= 2 ):
             raise ValueError("Teams must have either 1 player (Singles) or 2 players (Doubles).")
         return values
 
-    class Config:
-        from_attributes = True  
+    __config__: ConfigDict = {
+        'from_attributes': True,
+    }
 
 
 class Game(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     round_id: UUID
-    match_type: Literal["Singles", "Doubles"]
-    team_a: Team
-    team_b: Team
+    teams: List[Team]    
     score: str = Field("0 : 0", description="Default score at the start")  
+    date: DateType = Field(..., description="Date of the Game")
+    time: TimeType = Field(..., description="Date of the Game")
+    location: str = Field(..., min_length=3, max_length=100, description="Location of the game")  
+
+
 
     @model_validator(mode="before")
     @classmethod
@@ -51,37 +59,39 @@ class Game(BaseModel):
         cls.validate_no_ties(values)
         return values
 
-    @staticmethod
+    @field_validator("teams")
     def validate_team_size(values):
         """Ensure the correct team size based on the match type."""
         match_type = values["match_type"]
-        team_a = values["team_a"]
-        team_b = values["team_b"]
+        teams = values["teams"]
         expected_players = 1 if match_type == "Singles" else 2
 
-        if len(team_a.players) != expected_players or len(team_b.players) != expected_players:
-            raise ValueError(f"For {match_type}, teams must have {expected_players} player(s).")
+        for team in teams:
+            if len(team.players) != expected_players:
+                raise ValueError(f"For {match_type}, teams must have {expected_players} player(s).")
 
-    @staticmethod
+    @field_validator("teams")
     def validate_distinct_teams(values):
         """Ensure a player is not in both teams."""
-        team_a = values["team_a"]
-        team_b = values["team_b"]
+        teams = values["teams"]
+        all_players = []
 
-        players_a = {player.id for player in team_a.players}
-        players_b = {player.id for player in team_b.players}
+        for team in teams:
+            all_players.extend(player.id for player in team.players)
 
-        if players_a & players_b:
+        player_ids = set(all_players)
+        if len(player_ids) != len(all_players):
             raise ValueError("A player cannot be in both teams in the same game.")
+        
 
-    @staticmethod
-    def validate_score_format(values):
+    @field_validator("score")
+    def validate_score_format(cls, score):
         """Ensure score is correctly formatted as 'X : Y'."""
-        score = values["score"]
         try:
             score_a, score_b = map(int, score.split(" : "))
         except ValueError:
             raise ValueError("Score must be in the format 'X : Y', where X and Y are integers.")
+        return score
 
     @staticmethod
     def validate_total_score(values):
@@ -97,22 +107,24 @@ class Game(BaseModel):
         if score_a == score_b and score_a > 0:
             raise ValueError("A game must have a winner (No ties allowed).")
 
-    class Config:
-        from_attributes = True  
+    __config__: ConfigDict = {
+        'from_attributes': True,
+    }
 
 
 class Round(BaseModel):
     tournament_id: UUID = Field(default_factory=uuid4)
     name: str = Field(..., description="Round name (Quarter-finals, Semi-finals, Finals)")
     rounds: List[Game]
-    round_number: int = Field(..., ge=0, le=10,description="Round number must be between 1 and 10.")
+    round_number: int = Field(..., ge=1, description="Round number must be atleast 1")
 
     @field_serializer("tournament_id")
     def serialize_uuid(self, tournament_id):
         return str(tournament_id)
 
-    class Config:
-        from_attributes = True  
+    __config__: ConfigDict = {
+        'from_attributes': True,
+    }
 
 class Match(BaseModel):
     round_id: UUID = Field(default_factory=uuid4) # Foreign key
@@ -127,16 +139,19 @@ class Tournament(BaseModel):
     name: str = Field(..., min_length=3, max_length=100, description="Tournament name")
     rounds: List[Round]
     start_date: date
-    status: str = "ongoing"
+    status: Literal["upcoming", "ongoing", "completed", "cancelled"] = "upcoming"  
     rounds_count: int
+    location: str = Field(..., min_length=3, max_length=100, description="Tournament location")
 
     @model_validator(mode="before")
     @classmethod
     def validate_start_date(cls, values):
-        if values["start_date"] < date.today():
-            raise ValueError("Tournament start date cannot be in the past.")
+        start_date = values.get("start_date")
+        status = values.get("status", "ongoing")
+        if start_date and status == "ongoing" and start_date < date.today:
+            raise ValueError("Ongoing tournaments cannot have a start date in the past.")
         return values
     
-
-    class Config:
-        from_attributes = True  
+    __config__: ConfigDict = {
+        'from_attributes': True,
+    }
