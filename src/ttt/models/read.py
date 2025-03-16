@@ -1,7 +1,7 @@
 from datetime import date
 from typing import List
 
-from pydantic import UUID4, BaseModel, ConfigDict, Field
+from pydantic import UUID4, BaseModel, ConfigDict, Field, field_validator
 
 
 class Tournament(BaseModel):
@@ -47,3 +47,17 @@ class Player(BaseModel):
     id: UUID4
     name: str
     cumulative_score: int
+
+
+class MatchScore(BaseModel):
+    match_id: UUID4
+    team_ids: List[UUID4]
+    team_scores: List[int]
+
+    @field_validator("match_id", mode="after")
+    def match_id_to_str(cls, match_id):
+        return str(match_id)
+
+    @field_validator("team_ids", mode="after")
+    def team_ids_to_str(cls, team_ids):
+        return [str(team_id) for team_id in team_ids]
