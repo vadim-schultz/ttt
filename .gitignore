@@ -3,4 +3,4 @@ __pycache__
 env.py
 bak
 ttt.db
-
+.DS_Store
