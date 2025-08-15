@@ -3,4 +3,5 @@ __pycache__
 env.py
 bak
 ttt.db
+*.egg-info/
 

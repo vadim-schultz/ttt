@@ -4,8 +4,8 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-import ttt.models as models
-import ttt.schemas.orm as orm
+import app.models as models
+import app.schemas.orm as orm
 
 
 @pytest.fixture

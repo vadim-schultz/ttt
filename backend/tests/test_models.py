@@ -1,5 +1,5 @@
-import ttt.models as models
-import ttt.schemas.orm as orm
+import app.models as models
+import app.schemas.orm as orm
 
 
 # Test to create a complete tournament and read back the data
