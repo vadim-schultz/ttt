@@ -1,7 +1,7 @@
 import random
 from datetime import date
 
-from ttt.schemas.orm import Match, Player, Round, Team, Tournament
+from app.schemas.orm import Match, Player, Round, Team, Tournament
 
 
 def test_create_tournament(db_session):

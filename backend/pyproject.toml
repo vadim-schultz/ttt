@@ -34,7 +34,7 @@ Issues = "https://github.com/vadim-schultz/ttt/issues"
 Changelog = "https://github.com/vadim-schultz/ttt/CHANGELOG.md"
 
 [project.scripts]
-ttt = "ttt.__main__:main"
+run-backend = "app.__main__:main"
 
 # Optional dependencies (extras)
 [project.optional-dependencies]
@@ -51,12 +51,13 @@ test = [
 ]
 
 [tool.setuptools_scm]
-version_file = "src/ttt/_version.py"
+version_file = "app/_version.py"
 version_scheme = "guess-next-dev"
 local_scheme = "no-local-version"
+fallback_version = "0.1.0"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]
 
 [tool.setuptools.package-data]
 ttt = [
@@ -69,12 +70,12 @@ line-length = 120
 
 [tool.isort]
 profile = "black"
-src_paths = ["src", "tests"]
+src_paths = ["app", "tests"]
 
 [tool.coverage.run]
-source = ["ttt"]
+source = ["app"]
 relative_files = true
 omit = ["_version.py"]
 
 [tool.coverage.paths]
-source = ["src", "*/site-packages"]
+source = ["app", "*/site-packages"]
