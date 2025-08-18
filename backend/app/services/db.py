@@ -15,9 +15,8 @@ class Database:
     @property
     def engine(self):
         if self._engine is None:
-            self._engine = create_engine(
-                self._database_url, connect_args={"check_same_thread": False} if "sqlite" in self._database_url else {}
-            )
+            connect_args = {"check_same_thread": False} if self._database_url.startswith("sqlite") else {}
+            self._engine = create_engine(self._database_url, connect_args=connect_args)
         return self._engine
 
     @property

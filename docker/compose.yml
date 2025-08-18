@@ -1,0 +1,55 @@
+services:
+  db:
+    image: postgres:16
+    container_name: ttt-db
+    restart: always
+    environment:
+      POSTGRES_USER: user  # should come from secrets
+      POSTGRES_PASSWORD: user  # should come from secrets
+      POSTGRES_DB: ttt
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - node-network
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/backend.Dockerfile
+    container_name: ttt-backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - node-network
+    environment:
+      FRONTEND_HOSTNAME: ttt-frontend
+      POSTGRES_HOST: db
+      DATABASE_URL: postgresql+psycopg2://user:user@db:5432/ttt
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/frontend.Dockerfile
+    container_name: ttt-frontend
+    ports:
+      - "80:80"
+    networks:
+      - node-network
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
+
+networks:
+  node-network:
+    driver: bridge

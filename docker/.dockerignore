@@ -1,0 +1,29 @@
+# Ignore Python cache files
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# IDE files
+.idea
+
+# Virtual environments
+**/.venv
+**/venv
+
+# Ignore build artifacts
+**/dist
+**/build
+frontend/.vite
+frontend/node_modules
+
+# Ignore local environment files
+.env
+*.env
+
+# Ignore Git-related files
+.gitignore
+
+# Ignore .tox steps output
+**/.coverage
+**/coverage.xml
+**/.tox
