@@ -17,11 +17,12 @@ maintainers = [
 ]
 requires-python = ">=3.11"
 dependencies = [
-    "litestar[standard]",
     "jinja2",
+    "litestar[standard]",
+    "numpy",
+    "psycopg2-binary",
     "pydantic",
     "sqlalchemy",
-    "numpy",
 ]
 # Dynamic versioning with setuptools_scm
 dynamic = ["version"]
