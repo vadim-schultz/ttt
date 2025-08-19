@@ -4,6 +4,7 @@ from litestar import Litestar
 
 from app.routes import leaderboard, tournament, tournaments, update_score
 
+
 first_names = [
     "James",
     "Mary",

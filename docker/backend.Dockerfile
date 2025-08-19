@@ -32,4 +32,4 @@ EXPOSE 8000
 
 # Run the app from the package entry point
 ENTRYPOINT ["/bin/bash", "-c"]
-CMD [". ./venv/bin/activate && run-backend"]
+CMD [". ./venv/bin/activate && cd backend && alembic upgrade head && run-backend"]
