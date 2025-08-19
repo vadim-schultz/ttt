@@ -2,6 +2,7 @@ import os
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
+from app.schemas.orm import Base
 
 
 class Database:

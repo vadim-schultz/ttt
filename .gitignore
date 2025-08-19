@@ -4,4 +4,6 @@ env.py
 bak
 ttt.db
 *.egg-info/
-
+.idea/
+build/
+dist/
