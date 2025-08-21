@@ -2,13 +2,13 @@ from litestar import Litestar
 
 from app.routes import leaderboard, tournament, tournaments, update_score
 from app.services.db import get_db_session
-from app.services.utils import populate_full_tournament
+from app.services.utils import populate_tournaments
 
 
 def on_startup():
     try:
         with next(get_db_session()) as db:
-            populate_full_tournament(db)
+            populate_tournaments(db)
     finally:
         db.close()
 

@@ -115,44 +115,48 @@ def get_player_names(count: int = 24):
     return [f"{random.choice(first_names)} {random.choice(surnames)}" for _ in range(count)]
 
 
-def populate_full_tournament(db_session: Session, num_players: int = 24, rounds_count: int = 3):
-    """Populate the DB with a test tournament only if tables are empty."""
+def populate_tournaments(db_session: Session, num_tournaments: int = 4, num_players: int = 24, rounds_count: int = 4):
+    """Populate the DB with test tournaments only if tables are empty."""
 
-    # Check if tables already have data
+    # Check if tournaments already exist
     if db_session.query(Tournament).first():
         print("Tournament table is not empty, skipping seeding.")
         return
 
-    print("Seeding database with test tournament data...")
-    player_names = get_player_names(num_players)
+    print(f"Seeding database with {num_tournaments} test tournaments...")
 
-    # Step 1: Tournament
-    tournament = Tournament(start_date=date.today(), rounds_count=rounds_count)
-    db_session.add(tournament)
-    db_session.commit()
-
-    # Step 2: Players
-    players = [Player(name=name, cumulative_score=0) for name in player_names]
-    db_session.add_all(players)
-    db_session.commit()
-
-    # Step 3: Rounds and matches
-    for round_number in range(1, tournament.rounds_count + 1):
-        round_obj = Round(round_number=round_number, tournament_id=tournament.id)
-        db_session.add(round_obj)
+    for t_index in range(1, num_tournaments + 1):
+        # Step 1: Tournament
+        tournament = Tournament(
+            start_date=date.today(),
+            rounds_count=rounds_count,
+        )
+        db_session.add(tournament)
         db_session.commit()
 
-        for _ in range(6):  # 6 matches per round
-            match = Match(round_id=round_obj.id)
-            db_session.add(match)
+        # Step 2: Players (each tournament has its own pool of players)
+        player_names = get_player_names(num_players)
+        players = [Player(name=f"{name} (T{t_index})", cumulative_score=0) for name in player_names]
+        db_session.add_all(players)
+        db_session.commit()
+
+        # Step 3: Rounds and matches
+        for round_number in range(1, tournament.rounds_count + 1):
+            round_obj = Round(round_number=round_number, tournament_id=tournament.id)
+            db_session.add(round_obj)
             db_session.commit()
 
-            random.shuffle(players)
-            team1 = Team(match_id=match.id, score=random.randint(0, 21))
-            team2 = Team(match_id=match.id, score=random.randint(0, 21))
+            for _ in range(6):  # 6 matches per round
+                match = Match(round_id=round_obj.id)
+                db_session.add(match)
+                db_session.commit()
 
-            team1.players.extend(players[:2])
-            team2.players.extend(players[2:4])
+                random.shuffle(players)
+                team1 = Team(match_id=match.id, score=random.randint(0, 21))
+                team2 = Team(match_id=match.id, score=random.randint(0, 21))
 
-            db_session.add_all([team1, team2])
-            db_session.commit()
+                team1.players.extend(players[:2])
+                team2.players.extend(players[2:4])
+
+                db_session.add_all([team1, team2])
+                db_session.commit()
