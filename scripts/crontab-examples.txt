@@ -1,0 +1,27 @@
+# TTT PostgreSQL Database Backup Cron Jobs
+# 
+# Add these lines to your crontab using: crontab -e
+# 
+# Examples:
+
+# Daily backup at 2:00 AM
+0 2 * * * /home/eckar_fl/projects/ttt/scripts/backup_database.sh >> /var/log/ttt-backup.log 2>&1
+
+# Backup every 6 hours
+0 */6 * * * /home/eckar_fl/projects/ttt/scripts/backup_database.sh >> /var/log/ttt-backup.log 2>&1
+
+# Weekly backup on Sunday at 3:00 AM  
+0 3 * * 0 /home/eckar_fl/projects/ttt/scripts/backup_database.sh >> /var/log/ttt-backup.log 2>&1
+
+# Backup twice daily (6 AM and 6 PM)
+0 6,18 * * * /home/eckar_fl/projects/ttt/scripts/backup_database.sh >> /var/log/ttt-backup.log 2>&1
+
+# Instructions:
+# 1. Choose one of the above cron patterns
+# 2. Run: crontab -e  
+# 3. Add your chosen line to the crontab
+# 4. Save and exit
+# 5. Check crontab with: crontab -l
+# 
+# Log files will be created at /var/log/ttt-backup.log
+# Make sure the user running the cron has Docker permissions

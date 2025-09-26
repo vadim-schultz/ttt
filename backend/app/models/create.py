@@ -4,6 +4,7 @@ from pydantic import UUID4, BaseModel, field_serializer
 
 
 class Tournament(BaseModel):
+    name: str
     start_date: date
     status: str = "ongoing"
     rounds_count: int
@@ -36,3 +37,4 @@ class Team(BaseModel):
 
 class Player(BaseModel):
     name: str
+    email: str

@@ -1,16 +1,27 @@
 from litestar import Litestar
 
-from app.routes import leaderboard, tournament, tournaments, update_score
-from app.services.db import get_db_session
-from app.services.utils import populate_tournaments
+from app.routes import (
+    create_tournament,
+    delete_tournament,
+    health_check,
+    initialize_tournament,
+    leaderboard,
+    readiness_check,
+    register_player,
+    remove_player_from_tournament,
+    reset_tournament,
+    tournament,
+    tournament_leaderboard,
+    tournaments,
+    update_score,
+)
+from app.schemas.orm import Base
+from app.services.db import db_instance
 
 
 def on_startup():
-    try:
-        with next(get_db_session()) as db:
-            populate_tournaments(db)
-    finally:
-        db.close()
+    """Create database tables on startup."""
+    Base.metadata.create_all(bind=db_instance.engine)
 
 
 app = Litestar(
@@ -19,7 +30,16 @@ app = Litestar(
         tournaments,
         tournament,
         leaderboard,
+        tournament_leaderboard,
         update_score,
+        create_tournament,
+        register_player,
+        remove_player_from_tournament,
+        initialize_tournament,
+        reset_tournament,
+        delete_tournament,
+        health_check,
+        readiness_check,
     ],
     debug=True,
 )

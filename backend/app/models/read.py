@@ -8,10 +8,12 @@ class Tournament(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID4
+    name: str
     start_date: date
     status: str
     rounds_count: int
     rounds: List["Round"] = Field(..., default_factory=list)
+    registered_players: List["Player"] = Field(..., default_factory=list)
 
 
 class Round(BaseModel):
@@ -46,6 +48,7 @@ class Player(BaseModel):
 
     id: UUID4
     name: str
+    email: str
     cumulative_score: int
 
 

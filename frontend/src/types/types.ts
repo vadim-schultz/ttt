@@ -1,6 +1,7 @@
 export interface Player {
   id: string;
   name: string;
+  email: string;
   cumulative_score: number;
 }
 
@@ -27,14 +28,28 @@ export interface Round {
 
 export interface Tournament {
   id: string;
+  name: string;
   start_date: string; // ISO date
   status: string;
   rounds_count: number;
   rounds: Round[];
+  registered_players: Player[];
 }
 
 export interface MatchScore {
   match_id: string;
   team_ids: string[];
   team_scores: number[];
+}
+
+export interface CreateTournament {
+  name: string;
+  start_date: string;
+  status?: string;
+  rounds_count?: number;
+}
+
+export interface CreatePlayer {
+  name: string;
+  email: string;
 }

@@ -24,3 +24,27 @@ async def leaderboard(db: Session) -> List[models.read.Player]:
     )
 
     return [models.read.Player.model_validate(player._asdict()) for player in result]
+
+
+@get("/tournament/{tournament_id:str}/leaderboard", dependencies={"db": Provide(get_db_session)})
+async def tournament_leaderboard(db: Session, tournament_id: str) -> List[models.read.Player]:
+    """Fetches all players from a specific tournament sorted by highest score first."""
+    result = (
+        db.query(
+            orm.Player.id,
+            orm.Player.name,
+            orm.Player.email,
+            func.coalesce(func.sum(orm.Team.score), 0).label("cumulative_score"),
+        )
+        .join(orm.player_team_association, orm.Player.id == orm.player_team_association.c.player_id)
+        .join(orm.Team, orm.player_team_association.c.team_id == orm.Team.id)
+        .join(orm.Match, orm.Team.match_id == orm.Match.id)
+        .join(orm.Round, orm.Match.round_id == orm.Round.id)
+        .join(orm.Tournament, orm.Round.tournament_id == orm.Tournament.id)
+        .filter(orm.Tournament.id == tournament_id)
+        .group_by(orm.Player.id, orm.Player.name, orm.Player.email)
+        .order_by(func.sum(orm.Team.score).desc())
+        .all()
+    )
+
+    return [models.read.Player.model_validate(player._asdict()) for player in result]

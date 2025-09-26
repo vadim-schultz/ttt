@@ -15,6 +15,9 @@ RUN npm install && npm run build
 # Use Nginx to serve the frontend
 FROM nginx:alpine
 
+# Install curl for health checks
+RUN apk add --no-cache curl
+
 # Copy the build output to the Nginx HTML directory
 COPY --from=build /app/frontend/dist /usr/share/nginx/html
 
