@@ -1,4 +1,4 @@
-from litestar import Controller, post
+from litestar import Controller, post, Request
 from litestar.di import Provide
 from sqlalchemy.orm import Session
 from app.services.db import get_db_session
@@ -14,6 +14,6 @@ class ScoreController(Controller):
     path = "/score"
 
     @post("/", dependencies={"service": Provide(provide_score_service)})
-    async def update_score(self, request, service: ScoreService) -> dict:
+    async def update_score(self, request: Request, service: ScoreService) -> dict:
         form_data = await request.form()
         return await service.update_score(form_data)
