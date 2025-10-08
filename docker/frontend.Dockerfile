@@ -1,16 +1,25 @@
 # Use node to build the frontend
-FROM node AS build
+
+# Use official Node image for build stage
+FROM node:20 AS build
 
 # Install necessary packages for git
 RUN apt-get update && apt-get install -y git && apt-get clean
 
-# Copy backend directory to /app/frontend
-COPY frontend /app/frontend
-
-# Install dependencies and build package
+# Set working directory
 WORKDIR /app/frontend
-RUN npm install -g typescript vite
-RUN npm install && npm run build
+
+# Copy package.json and package-lock.json first for better caching
+COPY frontend/package*.json ./
+
+# Install dependencies (including devDependencies for build)
+RUN npm install
+
+# Copy the rest of the frontend source
+COPY frontend/ .
+
+# Build the frontend
+RUN npm run build
 
 # Use Nginx to serve the frontend
 FROM nginx:alpine
