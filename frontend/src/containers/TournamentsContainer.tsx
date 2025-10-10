@@ -9,26 +9,47 @@ import CenteredContainer from "@/components/ui/CenteredContainer";
 export default function TournamentsContainer() {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   useEffect(() => {
-    fetchTournaments();
+    void fetchTournaments();
   }, []);
 
-  const fetchTournaments = () => {
-    fetch("/api/")
-      .then((res) => res.json())
-      .then((data) => setTournaments(data))
-      .finally(() => setLoading(false));
+  const fetchTournaments = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/tournament");
+
+      if (!response.ok) {
+        throw new Error(`Failed to load tournaments (status ${response.status})`);
+      }
+
+      const data = await response.json();
+
+      if (!Array.isArray(data)) {
+        throw new Error("Unexpected response format from server");
+      }
+
+      setTournaments(data);
+    } catch (err) {
+      console.error("Error fetching tournaments:", err);
+      setTournaments([]);
+      setError(err instanceof Error ? err.message : "Failed to load tournaments");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleTournamentCreated = (tournament: Tournament) => {
-    setTournaments(prev => [tournament, ...prev]);
+    setTournaments((prev: Tournament[]) => [tournament, ...prev]);
     setShowCreateForm(false); // Hide the form after successful creation
   };
 
   const handleTournamentDeleted = (tournamentId: string) => {
-    setTournaments(prev => prev.filter(tournament => tournament.id !== tournamentId));
+    setTournaments((prev: Tournament[]) => prev.filter((tournament) => tournament.id !== tournamentId));
   };
 
   if (loading) {
@@ -49,10 +70,26 @@ export default function TournamentsContainer() {
   return (
     <CenteredContainer>
       <VStack gap={6}>
-        <TournamentsList 
-          tournaments={tournaments} 
-          onTournamentDeleted={handleTournamentDeleted}
-        />
+        {error ? (
+          <Box w="100%" p={6} borderWidth="1px" borderRadius="lg" borderColor="red.300">
+            <VStack gap={2}>
+              <Text color="red.500" fontWeight="semibold">
+                {"Couldn't load tournaments"}
+              </Text>
+              <Text color="red.400" fontSize="sm" textAlign="center">
+                {error}
+              </Text>
+              <Button size="sm" colorScheme="red" variant="outline" onClick={fetchTournaments}>
+                Retry
+              </Button>
+            </VStack>
+          </Box>
+        ) : (
+          <TournamentsList 
+            tournaments={tournaments} 
+            onTournamentDeleted={handleTournamentDeleted}
+          />
+        )}
         
         <Box w="100%">
           <VStack gap={4}>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type FormEvent, type ChangeEvent } from "react";
 import {
   Box,
   Button,
@@ -26,7 +26,7 @@ export default function TournamentCreationForm({ onTournamentCreated }: Tourname
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement | HTMLDivElement>) => {
     e.preventDefault();
     if (!formData.name || !formData.start_date) return;
     
@@ -39,7 +39,7 @@ export default function TournamentCreationForm({ onTournamentCreated }: Tourname
     setShowPasswordPrompt(false);
 
     try {
-      const response = await fetch("/api/tournaments", {
+  const response = await fetch("/api/tournament", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export default function TournamentCreationForm({ onTournamentCreated }: Tourname
   };
 
   const handleInputChange = (field: keyof CreateTournament, value: string | number) => {
-    setFormData(prev => ({
+    setFormData((prev: CreateTournament) => ({
       ...prev,
       [field]: value,
     }));
@@ -108,7 +108,7 @@ export default function TournamentCreationForm({ onTournamentCreated }: Tourname
             </Field.Label>
             <Input
               value={formData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => handleInputChange("name", e.target.value)}
               placeholder="Enter tournament name"
               bg="white"
               _dark={{ bg: "gray.700", borderColor: "gray.600", _placeholder: { color: "gray.400" } }}
@@ -124,7 +124,7 @@ export default function TournamentCreationForm({ onTournamentCreated }: Tourname
             <Input
               type="date"
               value={formData.start_date}
-              onChange={(e) => handleInputChange("start_date", e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => handleInputChange("start_date", e.target.value)}
               bg="white"
               _dark={{ bg: "gray.700", borderColor: "gray.600" }}
               borderColor="gray.300"
@@ -140,7 +140,7 @@ export default function TournamentCreationForm({ onTournamentCreated }: Tourname
               min="1"
               max="20"
               value={formData.rounds_count}
-              onChange={(e) => handleInputChange("rounds_count", parseInt(e.target.value) || 10)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => handleInputChange("rounds_count", parseInt(e.target.value, 10) || 10)}
               bg="white"
               _dark={{ bg: "gray.700", borderColor: "gray.600" }}
               borderColor="gray.300"

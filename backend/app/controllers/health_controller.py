@@ -11,11 +11,11 @@ def provide_health_service() -> HealthService:
 class HealthController(Controller):
     path = "/health"
 
-    @get("/", sync_to_thread=False)
+    @get("/")
     async def health_check(self) -> dict:
         return {"status": "healthy", "service": "ttt-backend", "message": "Service is running"}
 
-    @get("/ready", dependencies={"service": Provide(provide_health_service)})
+    @get("/ready", dependencies={"service": Provide(provide_health_service, sync_to_thread=False)})
     async def readiness_check(self, service: HealthService) -> Response:
         db_status = await service.check_db_ready()
         if db_status is True:

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Tabs, Spinner, Heading, Text, Button, HStack, Center, VStack } from "@chakra-ui/react";
+import { Tabs, Spinner, Heading, Text, Button, HStack, Center, VStack, Box } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 import type { Tournament, Player } from "@/types/types";
 import TournamentSchedule from "@/components/TournamentSchedule";
@@ -17,20 +17,56 @@ export default function TournamentContainer() {
   const [tournament, setTournament] = useState<Tournament | null>(null);
   const [leaderboard, setLeaderboard] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [leaderboardError, setLeaderboardError] = useState<string | null>(null);
 
   const fetchTournamentData = async () => {
-    if (!tournamentId) return;
-    
+    if (!tournamentId) {
+      setTournament(null);
+      setLeaderboard([]);
+      setError("Tournament ID is missing.");
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
     try {
-      const [tournamentData, leaderboardData] = await Promise.all([
-        fetch(`/api/tournament/${tournamentId}`).then(res => res.json()),
-        fetch(`/api/tournament/${tournamentId}/leaderboard`).then(res => res.json())
-      ]);
-      
+      const tournamentResponse = await fetch(`/api/tournament/${tournamentId}`);
+
+      if (!tournamentResponse.ok) {
+        throw new Error(`Failed to load tournament (status ${tournamentResponse.status})`);
+      }
+
+      const tournamentData: Tournament = await tournamentResponse.json();
       setTournament(tournamentData);
-      setLeaderboard(leaderboardData);
+
+      try {
+        const leaderboardResponse = await fetch(`/api/leaderboard/tournament/${tournamentId}`);
+
+        if (!leaderboardResponse.ok) {
+          if (leaderboardResponse.status === 404) {
+            setLeaderboard([]);
+            setLeaderboardError("Leaderboard is not available yet for this tournament.");
+          } else {
+            throw new Error(`Failed to load leaderboard (status ${leaderboardResponse.status})`);
+          }
+        } else {
+          const leaderboardData = await leaderboardResponse.json();
+          setLeaderboard(Array.isArray(leaderboardData) ? leaderboardData : []);
+          setLeaderboardError(null);
+        }
+      } catch (leaderboardProblem) {
+        console.warn("Unable to load leaderboard:", leaderboardProblem);
+        setLeaderboard([]);
+        setLeaderboardError("Leaderboard could not be loaded. Please try again later.");
+      }
     } catch (error) {
-      console.error('Failed to fetch tournament data:', error);
+      console.error("Failed to fetch tournament data:", error);
+      setTournament(null);
+      setLeaderboard([]);
+      setError(error instanceof Error ? error.message : "Failed to load tournament data.");
     } finally {
       setLoading(false);
     }
@@ -67,10 +103,12 @@ export default function TournamentContainer() {
   const handlePlayerRegistered = (player: Player) => {
     // Add the player to the tournament's registered players
     if (tournament) {
-      setTournament(prev => prev ? {
-        ...prev,
-        registered_players: [...(prev.registered_players || []), player]
-      } : null);
+      setTournament((prev: Tournament | null) => (prev
+        ? {
+            ...prev,
+            registered_players: [...(prev.registered_players || []), player],
+          }
+        : null));
     }
   };
 
@@ -88,7 +126,7 @@ export default function TournamentContainer() {
   };
 
   useEffect(() => {
-    fetchTournamentData();
+    void fetchTournamentData();
   }, [tournamentId]);
 
   if (loading) {
@@ -100,6 +138,22 @@ export default function TournamentContainer() {
             <Text color="gray.400" fontSize="lg">
               Loading tournament...
             </Text>
+          </VStack>
+        </Center>
+      </CenteredContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <CenteredContainer>
+        <Center h="300px">
+          <VStack gap={3}>
+            <Heading size="md" color="red.300">Unable to load tournament</Heading>
+            <Text color="red.200" textAlign="center">{error}</Text>
+            <Button size="sm" colorScheme="red" variant="outline" onClick={fetchTournamentData}>
+              Retry
+            </Button>
           </VStack>
         </Center>
       </CenteredContainer>
@@ -169,6 +223,11 @@ export default function TournamentContainer() {
         </Tabs.Content>
         
         <Tabs.Content value="leaderboard" py={4}>
+          {leaderboardError && (
+            <Box mb={4} p={3} borderWidth="1px" borderRadius="md" borderColor="red.300">
+              <Text color="red.300" fontSize="sm">{leaderboardError}</Text>
+            </Box>
+          )}
           <LeaderboardTable players={leaderboard} />
         </Tabs.Content>
         
