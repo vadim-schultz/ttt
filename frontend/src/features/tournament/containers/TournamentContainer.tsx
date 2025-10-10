@@ -12,7 +12,7 @@ import {
   Box,
 } from "@chakra-ui/react";
 import CenteredContainer from "@/components/ui/CenteredContainer";
-import LeaderboardTable from "@/components/LeaderboardTable";
+import LeaderboardTable from "@/features/leaderboard/components/LeaderboardTable";
 import type { CreatePlayer } from "@/types/types";
 import PlayerRegistrationForm from "../components/PlayerRegistrationForm";
 import RegisteredPlayersList from "../components/RegisteredPlayersList";
