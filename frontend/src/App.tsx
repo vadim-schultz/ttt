@@ -2,10 +2,12 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 // Containers / pages
-import TournamentsPage from "./containers/TournamentsContainer";
-import TournamentPage from "./containers/TournamentContainer";
-import LeaderboardPage from "./containers/LeaderboardContainer";
-import ScorePage from "./containers/ScoreContainer";
+import {
+  TournamentsContainer as TournamentsPage,
+  TournamentContainer as TournamentPage,
+} from "./features/tournament";
+import { LeaderboardContainer as LeaderboardPage } from "./features/leaderboard";
+import { ScoreContainer as ScorePage } from "./features/score";
 
 const App: React.FC = () => {
   return (
