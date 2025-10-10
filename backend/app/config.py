@@ -1,25 +1,31 @@
 from litestar import Litestar
 
-from app.routes import leaderboard, tournament, tournaments, update_score
-from app.services.db import get_db_session
-from app.services.utils import populate_tournaments
+from app.schemas.orm import Base
+from app.services.db import db_instance
+from app.controllers.tournament_controller import TournamentController
+from app.controllers.score_controller import ScoreController
+from app.controllers.leaderboard_controller import LeaderboardController
+from app.controllers.health_controller import HealthController
+from app.dependencies import dependencies
 
 
 def on_startup():
-    try:
-        with next(get_db_session()) as db:
-            populate_tournaments(db)
-    finally:
-        db.close()
+    """Create database tables on startup."""
+    Base.metadata.create_all(bind=db_instance.engine)
 
 
-app = Litestar(
-    on_startup=[on_startup],
-    route_handlers=[
-        tournaments,
-        tournament,
-        leaderboard,
-        update_score,
-    ],
-    debug=True,
-)
+def create_app() -> Litestar:
+    """Create and configure the Litestar application."""
+    return Litestar(
+        on_startup=[on_startup],
+        route_handlers=[
+            TournamentController,
+            ScoreController,
+            LeaderboardController,
+            HealthController,
+        ],
+        dependencies=dependencies,
+        debug=True,
+    )
+
+app = create_app()

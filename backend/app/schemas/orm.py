@@ -19,14 +19,24 @@ player_team_association = Table(
     Column("team_id", String, ForeignKey("teams.id"), primary_key=True),
 )
 
+# Association table for Tournament-Player many-to-many relationship (registrations)
+tournament_player_association = Table(
+    "tournament_players",
+    Base.metadata,
+    Column("tournament_id", String, ForeignKey("tournaments.id"), primary_key=True),
+    Column("player_id", String, ForeignKey("players.id"), primary_key=True),
+)
+
 
 class Tournament(Base):
     __tablename__ = "tournaments"
     id = Column(String, primary_key=True, default=get_uuid)
+    name = Column(String, nullable=False)
     start_date = Column(Date, nullable=False)
     status = Column(String, default="ongoing")  # ongoing, completed
     rounds_count = Column(Integer, default=10)
     rounds = relationship("Round", back_populates="tournament", cascade="all, delete-orphan")
+    registered_players = relationship("Player", secondary=tournament_player_association, back_populates="tournaments")
 
 
 class Round(Base):
@@ -61,6 +71,10 @@ class Player(Base):
     __tablename__ = "players"
     id = Column(String, primary_key=True, default=get_uuid)
     name = Column(String, nullable=False)
+    email = Column(String, nullable=False)
     cumulative_score = Column(Integer, default=0)
 
     teams = relationship("Team", secondary=player_team_association, back_populates="players")
+    tournaments = relationship(
+        "Tournament", secondary=tournament_player_association, back_populates="registered_players"
+    )
