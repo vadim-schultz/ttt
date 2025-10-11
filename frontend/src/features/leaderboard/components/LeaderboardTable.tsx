@@ -1,54 +1,12 @@
 import { Table, Box, Text, Flex, Badge, HStack } from "@chakra-ui/react";
 import type { Player } from "@/types/types";
+import { getRankBadge, getRowBackground } from "../services/leaderboardStyle";
 
 interface LeaderboardTableProps {
   players: Player[];
 }
 
-const getRankBadge = (rank: number) => {
-  switch (rank) {
-    case 1:
-      return { emoji: "🏆", color: "yellow", text: "#1" };
-    case 2:
-      return { emoji: "🥈", color: "gray", text: "#2" };
-    case 3:
-      return { emoji: "🥉", color: "orange", text: "#3" };
-    default:
-      return { emoji: "", color: "blue", text: `#${rank}` };
-  }
-};
-
-const getRowBackground = (rank: number) => {
-  switch (rank) {
-    case 1:
-      return "yellow.900";
-    case 2:
-      return "gray.700";
-    case 3:
-      return "orange.900";
-    default:
-      return "gray.800";
-  }
-};
-
 export default function LeaderboardTable({ players }: LeaderboardTableProps) {
-  if (!players || players.length === 0) {
-    return (
-      <Box
-        bg="gray.800"
-        borderRadius="lg"
-        p={8}
-        border="1px solid"
-        borderColor="gray.600"
-        textAlign="center"
-      >
-        <Text color="gray.400" fontSize="lg">
-          No players found in the leaderboard
-        </Text>
-      </Box>
-    );
-  }
-
   return (
     <Box
       bg="gray.800"
