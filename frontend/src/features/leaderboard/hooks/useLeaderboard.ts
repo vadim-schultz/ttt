@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { Player } from "@/types/types";
+import type { Player } from "@/features/shared/types";
 import { fetchLeaderboard } from "../services/leaderboardApi";
 
 interface UseLeaderboardResult {

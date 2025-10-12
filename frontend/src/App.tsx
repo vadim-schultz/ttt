@@ -1,24 +1,38 @@
-import React from "react";
+import { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-// Containers / pages
-import {
-  TournamentsContainer as TournamentsPage,
-  TournamentContainer as TournamentPage,
-} from "./features/tournament";
-import { LeaderboardContainer as LeaderboardPage } from "./features/leaderboard";
-import { ScoreContainer as ScorePage } from "./features/score";
+const TournamentsPage = lazy(
+  () => import("./features/tournament/containers/TournamentsContainer")
+);
+const TournamentPage = lazy(
+  () => import("./features/tournament/containers/TournamentContainer")
+);
+const LeaderboardPage = lazy(
+  () => import("./features/leaderboard/containers/LeaderboardContainer")
+);
+const ScorePage = lazy(
+  () => import("./features/score/containers/ScoreContainer")
+);
+
+function AppFallback() {
+  return <div>Loading...</div>;
+}
 
 const App: React.FC = () => {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<TournamentsPage />} />
-        <Route path="/tournament/:tournamentId" element={<TournamentPage />} />
-        <Route path="/leaderboard" element={<LeaderboardPage />} />
-        <Route path="/score/:matchId" element={<ScorePage />} />
-        <Route path="*" element={<div>Page not found</div>} />
-      </Routes>
+      <Suspense fallback={<AppFallback />}>
+        <Routes>
+          <Route path="/" element={<TournamentsPage />} />
+          <Route
+            path="/tournament/:tournamentId"
+            element={<TournamentPage />}
+          />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
+          <Route path="/score/:matchId" element={<ScorePage />} />
+          <Route path="*" element={<div>Page not found</div>} />
+        </Routes>
+      </Suspense>
     </Router>
   );
 };

@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Box, Button, VStack, HStack, Text, Heading } from "@chakra-ui/react";
-import type { Tournament } from "@/types/types";
+import type { Tournament, StatusMessage } from "@/features/shared/types";
 import AdminPasswordPrompt from "@/components/AdminPasswordPrompt";
-import type { StatusMessage } from "@/features/shared/types/status";
 
 interface TournamentResetProps {
   tournament: Tournament;

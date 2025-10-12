@@ -1,5 +1,5 @@
 import { Box, VStack, Heading, Text, Grid } from "@chakra-ui/react";
-import type { Tournament, Round, Match } from "@/types/types";
+import type { Tournament, Round, Match } from "@/features/shared/types";
 import MatchCard from "./MatchCard";
 
 interface TournamentScheduleProps {

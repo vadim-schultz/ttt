@@ -16,7 +16,7 @@ export interface Match {
   id: string;
   round_id: string;
   teams: Team[];
-  score: number; // derived
+  score: number;
 }
 
 export interface Round {
@@ -29,7 +29,7 @@ export interface Round {
 export interface Tournament {
   id: string;
   name: string;
-  start_date: string; // ISO date
+  start_date: string;
   status: string;
   rounds_count: number;
   rounds: Round[];

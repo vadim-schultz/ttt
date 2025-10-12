@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
-import type { CreateTournament, Tournament } from "@/types/types";
+import type {
+  CreateTournament,
+  Tournament,
+  StatusMessage,
+} from "@/features/shared/types";
 import {
   createTournament,
   deleteTournament,
   fetchTournaments,
 } from "../services/tournamentApi";
-import type { StatusMessage } from "@/features/shared/types/status";
 
 interface UseTournamentsResult {
   tournaments: Tournament[];

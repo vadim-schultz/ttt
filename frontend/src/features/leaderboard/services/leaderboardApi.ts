@@ -1,4 +1,4 @@
-import type { Player } from "@/types/types";
+import type { Player } from "@/features/shared/types";
 
 const LEADERBOARD_ENDPOINT = "/api/leaderboard";
 

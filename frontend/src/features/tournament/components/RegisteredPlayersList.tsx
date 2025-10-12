@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Box, Heading, VStack, Text, HStack, Button } from "@chakra-ui/react";
 import AdminPasswordPrompt from "@/components/AdminPasswordPrompt";
-import type { Player } from "@/types/types";
+import type { Player } from "@/features/shared/types";
 
 interface RegisteredPlayersListProps {
   players: Player[];

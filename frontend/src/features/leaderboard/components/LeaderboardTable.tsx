@@ -1,5 +1,5 @@
 import { Table, Box, Text, Flex, Badge, HStack } from "@chakra-ui/react";
-import type { Player } from "@/types/types";
+import type { Player } from "@/features/shared/types";
 import { getRankBadge, getRowBackground } from "../services/leaderboardStyle";
 
 interface LeaderboardTableProps {

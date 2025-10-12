@@ -8,8 +8,7 @@ import {
   Heading,
   Text,
 } from "@chakra-ui/react";
-import type { CreatePlayer } from "@/types/types";
-import type { StatusMessage } from "@/features/shared/types/status";
+import type { CreatePlayer, StatusMessage } from "@/features/shared/types";
 
 interface PlayerRegistrationFormProps {
   onSubmit: (data: CreatePlayer) => Promise<void>;

@@ -3,7 +3,7 @@ import type {
   CreateTournament,
   Player,
   Tournament,
-} from "@/types/types";
+} from "@/features/shared/types";
 
 interface MatchScorePayload {
   matchId: string;

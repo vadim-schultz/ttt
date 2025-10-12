@@ -1,36 +1,35 @@
+import LoadingState from "@/components/ui/LoadingState";
+import ErrorState from "@/components/ui/ErrorState";
 import useLeaderboard from "../hooks/useLeaderboard";
 import LeaderboardContent from "../components/LeaderboardContent";
 import LeaderboardEmptyState from "../components/LeaderboardEmptyState";
-import LeaderboardError from "../components/LeaderboardError";
-import LeaderboardLoading from "../components/LeaderboardLoading";
 import LeaderboardTable from "../components/LeaderboardTable";
 
 export default function LeaderboardContainer() {
   const { players, loading, error } = useLeaderboard();
 
-  const view = (() => {
-    switch (true) {
-      case loading:
-        return <LeaderboardLoading />;
-      case Boolean(error):
-        return <LeaderboardError message={error ?? null} />;
-      default: {
-        const leaderboardView =
-          players.length === 0 ? (
-            <LeaderboardEmptyState />
-          ) : (
-            <LeaderboardTable players={players} />
-          );
+  if (loading) {
+    return <LoadingState message="Loading leaderboard..." />;
+  }
 
-        return (
-          <LeaderboardContent
-            players={players}
-            leaderboardView={leaderboardView}
-          />
-        );
-      }
-    }
-  })();
+  if (error) {
+    return (
+      <ErrorState
+        layout="alert"
+        title="Error Loading Leaderboard"
+        message={error}
+      />
+    );
+  }
 
-  return view;
+  const leaderboardView =
+    players.length === 0 ? (
+      <LeaderboardEmptyState />
+    ) : (
+      <LeaderboardTable players={players} />
+    );
+
+  return (
+    <LeaderboardContent players={players} leaderboardView={leaderboardView} />
+  );
 }

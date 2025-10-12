@@ -12,7 +12,7 @@ import {
 import { MdDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import AdminPasswordPrompt from "@/components/AdminPasswordPrompt";
-import type { Tournament } from "@/types/types";
+import type { Tournament } from "@/features/shared/types";
 
 interface TournamentsListProps {
   tournaments: Tournament[];

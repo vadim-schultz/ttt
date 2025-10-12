@@ -9,7 +9,7 @@ import {
   Flex,
   Separator,
 } from "@chakra-ui/react";
-import type { Match, Player, Team } from "@/types/types";
+import type { Match, Player, Team } from "@/features/shared/types";
 
 interface MatchCardProps {
   match: Match;

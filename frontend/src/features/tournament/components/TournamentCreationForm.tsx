@@ -9,8 +9,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import AdminPasswordPrompt from "@/components/AdminPasswordPrompt";
-import type { CreateTournament } from "@/types/types";
-import type { StatusMessage } from "@/features/shared/types/status";
+import type { CreateTournament, StatusMessage } from "@/features/shared/types";
 
 interface TournamentCreationFormProps {
   onSubmit: (payload: CreateTournament) => Promise<void>;

@@ -4,8 +4,8 @@ import type {
   MatchScore,
   Player,
   Tournament,
-} from "@/types/types";
-import type { StatusMessage } from "@/features/shared/types/status";
+  StatusMessage,
+} from "@/features/shared/types";
 import {
   fetchTournament,
   fetchTournamentLeaderboard,
