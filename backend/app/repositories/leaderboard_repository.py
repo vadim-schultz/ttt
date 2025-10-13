@@ -11,11 +11,12 @@ class LeaderboardRepository:
             self.db.query(
                 orm.Player.id,
                 orm.Player.name,
+                orm.Player.email,
                 func.coalesce(func.sum(orm.Team.score), 0).label("cumulative_score"),
             )
             .join(orm.player_team_association, orm.Player.id == orm.player_team_association.c.player_id)
             .join(orm.Team, orm.player_team_association.c.team_id == orm.Team.id)
-            .group_by(orm.Player.id, orm.Player.name)
+            .group_by(orm.Player.id, orm.Player.name, orm.Player.email)
             .order_by(func.sum(orm.Team.score).desc())
             .all()
         )

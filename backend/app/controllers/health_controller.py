@@ -1,12 +1,5 @@
-from litestar import Controller, get, Response, status_codes
-from litestar.di import Provide
+from litestar import Controller, Response, get, status_codes
 from app.services.health_service import HealthService
-
-# Dependency provider
-
-def provide_health_service() -> HealthService:
-    from app.repositories.health_repository import HealthRepository
-    return HealthService(HealthRepository())
 
 class HealthController(Controller):
     path = "/health"
@@ -15,9 +8,9 @@ class HealthController(Controller):
     async def health_check(self) -> dict:
         return {"status": "healthy", "service": "ttt-backend", "message": "Service is running"}
 
-    @get("/ready", dependencies={"service": Provide(provide_health_service, sync_to_thread=False)})
-    async def readiness_check(self, service: HealthService) -> Response:
-        db_status = await service.check_db_ready()
+    @get("/ready")
+    async def readiness_check(self, health_service: HealthService) -> Response:
+        db_status = await health_service.check_db_ready()
         if db_status is True:
             return Response(
                 content={

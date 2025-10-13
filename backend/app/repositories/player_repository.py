@@ -15,20 +15,23 @@ class PlayerRepository:
         tournament = self.db.query(orm.Tournament).filter(orm.Tournament.id == tournament_id).first()
         if not tournament:
             raise Exception("Tournament not found")
-        existing_player = self.get_by_email(player_data.email)
-        if existing_player:
-            if existing_player in tournament.registered_players:
-                raise Exception("Player already registered for this tournament")
-            tournament.registered_players.append(existing_player)
-        else:
-            player = orm.Player(name=player_data.name, email=player_data.email)
-            self.db.add(player)
+
+        try:
+            player = self.get_by_email(player_data.email)
+            if player:
+                if player in tournament.registered_players:
+                    raise Exception("Player already registered for this tournament")
+            else:
+                player = orm.Player(name=player_data.name, email=player_data.email)
+                self.db.add(player)
+
+            tournament.registered_players.append(player)
             self.db.commit()
             self.db.refresh(player)
-            tournament.registered_players.append(player)
-            existing_player = player
-        self.db.commit()
-        return existing_player
+            return player
+        except Exception:
+            self.db.rollback()
+            raise
 
     def remove_from_tournament(self, tournament_id: str, player_id: str):
         tournament = self.db.query(orm.Tournament).filter(orm.Tournament.id == tournament_id).first()

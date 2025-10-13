@@ -3,6 +3,7 @@ import random
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 import app.models as models
 import app.schemas.orm as orm
@@ -40,8 +41,15 @@ def player_names():
 
 @pytest.fixture(scope="session")
 def engine():
-    return create_engine("sqlite:///:memory:", echo=True)
+    engine = create_engine(
+        "sqlite://",
+        echo=True,
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
     # return create_engine("sqlite:///ttt.db")
+    yield engine
+    engine.dispose()
 
 
 @pytest.fixture(scope="session")
@@ -55,7 +63,7 @@ def tables(engine):
 def db_session(engine, tables):
     """Returns an sqlalchemy session, and after the test tears down everything properly."""
     connection = engine.connect()
-    # transaction = connection.begin()
+    transaction = connection.begin()
 
     # Bind an individual Session to the connection
     Session = sessionmaker(bind=connection)
@@ -64,8 +72,8 @@ def db_session(engine, tables):
     yield session
 
     session.close()
-    # transaction.rollback()
-    # connection.close()
+    transaction.rollback()
+    connection.close()
 
 
 @pytest.fixture
@@ -73,7 +81,7 @@ def tournament(db_session, player_names):
     """Create a full tournament with 24 players, following the correct hierarchy."""
 
     # Step 1: Create the Tournament
-    tournament_data = models.create.Tournament(start_date="2025-02-15", rounds_count=10)
+    tournament_data = models.create.Tournament(name="Fixture Tournament", start_date="2025-02-15", rounds_count=10)
     tournament_model = orm.Tournament(**tournament_data.model_dump())
 
     db_session.add(tournament_model)
@@ -133,11 +141,11 @@ def tournament(db_session, player_names):
         player1_name = next(player_iter, f"Player_{len(teams)}")
         player2_name = next(player_iter, f"Player_{len(teams) + 1}")
 
-        player1_data = models.create.Player(name=player1_name)
+        player1_data = models.create.Player(name=player1_name, email=f"{player1_name.lower()}@example.com")
         player1_model = orm.Player(**player1_data.model_dump())
         player1_model.teams.append(team_model)
 
-        player2_data = models.create.Player(name=player2_name)
+        player2_data = models.create.Player(name=player2_name, email=f"{player2_name.lower()}@example.com")
         player2_model = orm.Player(**player2_data.model_dump())
         player2_model.teams.append(team_model)
 
