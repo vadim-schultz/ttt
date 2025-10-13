@@ -1,5 +1,5 @@
 import { Center, Spinner, Text, VStack } from "@chakra-ui/react";
-import CenteredContainer from "@/components/ui/CenteredContainer";
+import { CenteredContainer } from "@/shared/ui";
 
 export default function LeaderboardLoading() {
   return (

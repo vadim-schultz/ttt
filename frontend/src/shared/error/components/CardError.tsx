@@ -1,31 +1,35 @@
-import { Button, Center, Heading, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Text, VStack } from "@chakra-ui/react";
 
-import CenteredContainer from "@/components/ui/CenteredContainer";
+import { CenteredContainer } from "@/shared/ui";
 
-interface CenteredErrorProps {
+interface CardErrorProps {
   title: string;
   message?: string | null;
   actionLabel?: string;
   onAction?: () => void;
-  height?: string | number;
 }
 
-export default function CenteredError({
+export default function CardError({
   title,
   message,
   actionLabel,
   onAction,
-  height = "300px",
-}: CenteredErrorProps) {
+}: CardErrorProps) {
   return (
     <CenteredContainer>
-      <Center h={height}>
-        <VStack gap={3}>
-          <Heading size="md" color="red.300" textAlign="center">
+      <Box
+        w="100%"
+        p={6}
+        borderWidth="1px"
+        borderRadius="lg"
+        borderColor="red.300"
+      >
+        <VStack gap={2}>
+          <Text color="red.500" fontWeight="semibold">
             {title}
-          </Heading>
+          </Text>
           {message && (
-            <Text color="red.200" textAlign="center">
+            <Text color="red.400" fontSize="sm" textAlign="center">
               {message}
             </Text>
           )}
@@ -40,7 +44,7 @@ export default function CenteredError({
             </Button>
           )}
         </VStack>
-      </Center>
+      </Box>
     </CenteredContainer>
   );
 }

@@ -1,5 +1,5 @@
 import { Box, Button, Text, VStack } from "@chakra-ui/react";
-import CenteredContainer from "@/components/ui/CenteredContainer";
+import { CenteredContainer } from "@/shared/ui";
 
 interface TournamentsErrorProps {
   message: string;

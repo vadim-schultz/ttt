@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useState } from "react";
 import type { KeyboardEvent } from "react";
 
-import { AdminPasswordPromptIdle } from "@/shared/components/admin-password/AdminPasswordPromptIdle";
-import { AdminPasswordPromptIncorrect } from "@/shared/components/admin-password/AdminPasswordPromptIncorrect";
-import { AdminPasswordPromptMissing } from "@/shared/components/admin-password/AdminPasswordPromptMissing";
-import type { AdminPasswordPromptCommonProps } from "@/shared/components/admin-password/types";
+import { AdminPasswordPromptIdle } from "../components/AdminPasswordPromptIdle";
+import { AdminPasswordPromptIncorrect } from "../components/AdminPasswordPromptIncorrect";
+import { AdminPasswordPromptMissing } from "../components/AdminPasswordPromptMissing";
+import type { AdminPasswordPromptCommonProps } from "../components/types";
 
 export interface AdminPasswordPromptProps {
   title: string;

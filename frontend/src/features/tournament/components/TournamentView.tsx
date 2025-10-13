@@ -7,7 +7,7 @@ import {
   VStack,
   Box,
 } from "@chakra-ui/react";
-import CenteredContainer from "@/components/ui/CenteredContainer";
+import { CenteredContainer } from "@/shared/ui";
 import LeaderboardTable from "@/features/leaderboard/components/LeaderboardTable";
 import type {
   CreatePlayer,

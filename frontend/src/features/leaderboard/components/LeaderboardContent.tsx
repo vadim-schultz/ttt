@@ -1,7 +1,7 @@
 import { Box, Text, VStack } from "@chakra-ui/react";
 import type { Player } from "@/features/shared/types";
 import type { ReactNode } from "react";
-import CenteredContainer from "@/components/ui/CenteredContainer";
+import { CenteredContainer } from "@/shared/ui";
 
 interface Props {
   players: Player[];

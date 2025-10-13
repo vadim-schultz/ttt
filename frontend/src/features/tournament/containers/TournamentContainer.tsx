@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import LoadingState from "@/components/ui/LoadingState";
-import { ErrorState } from "@/shared/ui/error";
+import { LoadingState } from "@/shared/ui";
+import { ErrorState } from "@/shared/error";
 import { useTournament } from "../hooks/useTournament";
 import TournamentNotFound from "../components/TournamentNotFound";
 import TournamentView from "../components/TournamentView";
