@@ -11,15 +11,21 @@ RUN apt-get --yes update && apt-get --yes install python3 python3-pip python3-ve
 RUN groupadd -r user && useradd --no-log-init -r -g user user
 
 # Copy backend directory to /app/backend
-COPY --chown=user:user backend /app/backend
+COPY backend /app/backend
+
+# .git/ is required for version resolution
+COPY .git /app/.git
 
 # Change to /app/ directory
 WORKDIR /app/
 
-RUN python3 -m venv venv && . ./venv/bin/activate && pip install ./backend/
+# Activate venv and install package
+RUN chown --recursive user:user /app
 
 # Switch to the non-root user
 USER user
+
+RUN python3 -m venv venv && . ./venv/bin/activate && pip install ./backend/
 
 # Expose the port the app runs on (8000 by default for Litestar)
 EXPOSE 8000
