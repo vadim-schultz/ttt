@@ -5,7 +5,7 @@ from app.schemas.orm import Match, Player, Round, Team, Tournament
 
 
 def test_create_tournament(db_session):
-    tournament = Tournament(start_date=date.today())
+    tournament = Tournament(name="Test Tournament", start_date=date.today())
     db_session.add(tournament)
     db_session.commit()
 
@@ -13,7 +13,7 @@ def test_create_tournament(db_session):
 
 
 def test_create_round(db_session):
-    tournament = Tournament(start_date=date.today())
+    tournament = Tournament(name="Round Test", start_date=date.today())
     db_session.add(tournament)
     db_session.commit()
 
@@ -26,7 +26,7 @@ def test_create_round(db_session):
 
 
 def test_create_match(db_session):
-    tournament = Tournament(start_date=date.today())
+    tournament = Tournament(name="Match Test", start_date=date.today())
     db_session.add(tournament)
     db_session.commit()
 
@@ -64,8 +64,8 @@ def test_create_players_and_assign_to_team(db_session):
     db_session.add(team)
     db_session.commit()
 
-    player1 = Player(name="Alice", cumulative_score=0)
-    player2 = Player(name="Bob", cumulative_score=0)
+    player1 = Player(name="Alice", email="alice@example.com", cumulative_score=0)
+    player2 = Player(name="Bob", email="bob@example.com", cumulative_score=0)
 
     team.players.append(player1)
     team.players.append(player2)
@@ -86,8 +86,8 @@ def test_players_inherit_team_score(db_session):
     db_session.add(team)
     db_session.commit()
 
-    player1 = Player(name="Charlie")
-    player2 = Player(name="Dana")
+    player1 = Player(name="Charlie", email="charlie@example.com")
+    player2 = Player(name="Dana", email="dana@example.com")
     team.players.append(player1)
     team.players.append(player2)
     db_session.commit()
@@ -102,11 +102,11 @@ def test_players_inherit_team_score(db_session):
 
 def test_create_full_tournament_structure(db_session, player_names):
     # Step 1: Create tournament
-    tournament = Tournament(start_date=date.today())
+    tournament = Tournament(name="Full Tournament", start_date=date.today())
     db_session.add(tournament)
     db_session.commit()
 
-    players = [Player(name=name, cumulative_score=0) for name in player_names]
+    players = [Player(name=name, email=f"{name.lower()}@example.com", cumulative_score=0) for name in player_names]
     db_session.add_all(players)
     db_session.commit()
 

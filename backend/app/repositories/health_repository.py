@@ -1,21 +1,15 @@
-import os
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 
+from app.services.db import db_instance
+
+
 class HealthRepository:
-    def check_db(self, database_url=None):
-        database_url = database_url or os.getenv("DATABASE_URL", "postgresql+psycopg2://user:user@db:5432/ttt")
-        engine = create_engine(
-            database_url,
-            pool_timeout=2,
-            pool_recycle=30,
-            connect_args={"connect_timeout": 3},
-        )
-        Session = sessionmaker(bind=engine)
-        session = Session()
-        try:
-            result = session.execute(text("SELECT 1")).fetchone()
-            return result is not None
-        finally:
-            session.close()
-            engine.dispose()
+    def __init__(self, session_factory: sessionmaker | None = None) -> None:
+        self._session_factory = session_factory or db_instance.session_local
+
+    def check_db(self) -> bool:
+        session_factory = self._session_factory
+        with session_factory() as session:
+            result = session.execute(text("SELECT 1")).scalar()
+            return bool(result)
