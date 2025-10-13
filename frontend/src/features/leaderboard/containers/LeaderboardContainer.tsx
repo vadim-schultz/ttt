@@ -1,5 +1,5 @@
 import LoadingState from "@/components/ui/LoadingState";
-import ErrorState from "@/components/ui/ErrorState";
+import { ErrorState } from "@/shared/ui/error";
 import useLeaderboard from "../hooks/useLeaderboard";
 import LeaderboardContent from "../components/LeaderboardContent";
 import LeaderboardEmptyState from "../components/LeaderboardEmptyState";

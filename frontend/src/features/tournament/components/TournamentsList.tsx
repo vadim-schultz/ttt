@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { MdDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import AdminPasswordPrompt from "@/components/AdminPasswordPrompt";
+import AdminPasswordPrompt from "@/shared/admin-password";
 import type { Tournament } from "@/features/shared/types";
 
 interface TournamentsListProps {

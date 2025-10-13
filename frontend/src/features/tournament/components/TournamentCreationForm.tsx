@@ -8,7 +8,7 @@ import {
   Heading,
   Text,
 } from "@chakra-ui/react";
-import AdminPasswordPrompt from "@/components/AdminPasswordPrompt";
+import AdminPasswordPrompt from "@/shared/admin-password";
 import type { CreateTournament, StatusMessage } from "@/features/shared/types";
 
 interface TournamentCreationFormProps {

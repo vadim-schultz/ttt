@@ -1,5 +1,5 @@
 import LoadingState from "@/components/ui/LoadingState";
-import ErrorState from "@/components/ui/ErrorState";
+import { ErrorState } from "@/shared/ui/error";
 import { useTournaments } from "../hooks/useTournaments";
 import TournamentsView from "../components/TournamentsView";
 import { useTournamentsHandlers } from "../services/tournamentsHandlers";
