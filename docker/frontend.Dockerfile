@@ -1,28 +1,26 @@
-# Use node to build the frontend
-FROM node AS build
+# Use public Docker Hub by default; override via build args for corporate pull-through cache.
+ARG DOCKER_REGISTRY=docker.io
+ARG NPM_REGISTRY=https://registry.npmjs.org/
+
+FROM ${DOCKER_REGISTRY}/library/node AS build
 
 # Install necessary packages for git
 RUN apt-get update && apt-get install -y git && apt-get clean
 
-# Copy backend directory to /app/frontend
 COPY frontend /app/frontend
 
-# Install dependencies and build package
 WORKDIR /app/frontend
-RUN npm install -g typescript vite
-RUN npm install && npm run build
 
-# Use Nginx to serve the frontend
-FROM nginx:alpine
+ARG NPM_REGISTRY
+RUN npm install -g typescript vite --registry ${NPM_REGISTRY}
+RUN npm install --registry ${NPM_REGISTRY} && npm run build
 
-# Copy the build output to the Nginx HTML directory
+FROM ${DOCKER_REGISTRY}/library/nginx:alpine
+
 COPY --from=build /app/frontend/dist /usr/share/nginx/html
 
-# Copy custom Nginx configuration
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose port 80
 EXPOSE 80
 
-# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]

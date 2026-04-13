@@ -23,6 +23,13 @@ services:
     build:
       context: ..
       dockerfile: docker/backend.Dockerfile
+      args:
+        - DOCKER_REGISTRY=${DOCKER_REGISTRY:-docker.io}
+        - PYPI_INDEX_URL=${PYPI_INDEX_URL}
+        - PYPI_EXTRA_INDEX_URL=${PYPI_EXTRA_INDEX_URL}
+        - HTTP_PROXY=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - NO_PROXY=${NO_PROXY}
     container_name: ttt-backend
     ports:
       - "8000:8000"
@@ -39,6 +46,9 @@ services:
     build:
       context: ..
       dockerfile: docker/frontend.Dockerfile
+      args:
+        - DOCKER_REGISTRY=${DOCKER_REGISTRY:-docker.io}
+        - NPM_REGISTRY=${NPM_REGISTRY:-https://registry.npmjs.org/}
     container_name: ttt-frontend
     ports:
       - "80:80"

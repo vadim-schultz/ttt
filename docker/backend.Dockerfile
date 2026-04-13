@@ -1,35 +1,40 @@
-# Set the base image
-FROM ubuntu:24.04
+# Use public Docker Hub by default; override via build args for corporate pull-through cache.
+ARG DOCKER_REGISTRY=docker.io
 
-# Set the working directory to /app
+FROM ${DOCKER_REGISTRY}/library/ubuntu:24.04
+
 WORKDIR /app
 
-# Install required modules
+# Optional proxy and PyPI settings (passed via compose build args / .env)
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
+ARG PYPI_INDEX_URL
+ARG PYPI_EXTRA_INDEX_URL
+
 RUN apt-get --yes update && apt-get --yes install python3 python3-pip python3-venv git
 
-# Create a non-root user and group for security
+# System-wide pip config so non-root installs also use corporate indexes when provided.
+RUN if [ -n "$PYPI_INDEX_URL" ]; then \
+        printf '[global]\ndisable-pip-version-check = true\nindex = %s\nindex-url = %s\n' "$PYPI_INDEX_URL" "$PYPI_INDEX_URL" > /etc/pip.conf && \
+        if [ -n "$PYPI_EXTRA_INDEX_URL" ]; then printf 'extra-index-url = %s\n' "$PYPI_EXTRA_INDEX_URL" >> /etc/pip.conf; fi; \
+    fi
+
 RUN groupadd -r user && useradd --no-log-init -r -g user user
 
-# Copy backend directory to /app/backend
 COPY backend /app/backend
 
-# .git/ is required for version resolution
 COPY .git /app/.git
 
-# Change to /app/ directory
 WORKDIR /app/
 
-# Activate venv and install package
 RUN chown --recursive user:user /app
 
-# Switch to the non-root user
 USER user
 
 RUN python3 -m venv venv && . ./venv/bin/activate && pip install ./backend/
 
-# Expose the port the app runs on (8000 by default for Litestar)
 EXPOSE 8000
 
-# Run the app from the package entry point
 ENTRYPOINT ["/bin/bash", "-c"]
 CMD [". ./venv/bin/activate && cd backend && alembic upgrade head && run-backend"]
